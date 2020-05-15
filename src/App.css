@@ -87,18 +87,17 @@ body {
 	width: 12.5%;
 	height: 12.5%;
 	flex-direction: column-reverse;
-  align-items: baseline;
-  background-size: cover;
-  background-repeat: no-repeat;
-  transition: .2s;
+	align-items: baseline;
+	background: contain;
+	background-repeat: no-repeat;
+	transition: 0.2s;
 }
 
-.Square:hover{
+.Square:hover {
 	cursor: pointer;
-	opacity: .8;
-		box-shadow: 0 0 10px 3px black;
-		background-size: 120%;
-		background-position: ;
+	opacity: 0.8;
+	box-shadow: 0 0 10px 3px black;
+	background-position: 0px -10px;
 }
 
 .Square-text {
@@ -116,8 +115,8 @@ body {
 }
 
 .piece-image {
-  height: 100%;
-  width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 .Board {
@@ -129,9 +128,9 @@ body {
 	max-width: 90vh;
 	flex-wrap: wrap;
 	z-index: 2;
-  flex-direction: row-reverse;
-  border: 1px solid gray;
-  box-shadow: grey 1px 1px 50px;
+	flex-direction: row-reverse;
+	border: 1px solid gray;
+	box-shadow: grey 1px 1px 50px;
 }
 
 .Board:after {
@@ -140,48 +139,72 @@ body {
 }
 
 .markers {
-  font-size: 1.2rem;
-  font-family: "OperatorMonoBook";
+	font-size: 1.2rem;
+	font-family: 'OperatorMonoBook';
 }
 
 .Files {
-  width: 70vw;
-  min-width: 400px;
-  max-width: 90vh;
-  height: 20px;
+	width: 70vw;
+	min-width: 400px;
+	max-width: 90vh;
+	height: 20px;
 }
 
 .File-marker {
-  width: 12.5%;
-  margin-top: 5px;
+	width: 12.5%;
+	margin-top: 5px;
 }
 
 .Ranks {
-  height: 70vw;
-  min-height: 400px;
-  max-height: 90vh;
+	height: 70vw;
+	min-height: 400px;
+	max-height: 90vh;
 }
 
 .Rank-marker {
-  height: 12.5%;
-  margin-right: 8px;
+	height: 12.5%;
+	margin-right: 8px;
 }
 
-.p { background-image: url('./assets/img/black_pawn1x.svg'); }
-.P { background-image: url('./assets/img/white_pawn1x.svg'); }
-.r { background-image: url('./assets/img/black_rook1x.svg'); }
-.n { background-image: url('./assets/img/black_knight1x.svg'); }
-.b { background-image: url('./assets/img/black_bishop1x.svg'); }
-.q { background-image: url('./assets/img/black_queen1x.svg'); }
-.k { background-image: url('./assets/img/black_king1x.svg'); }
-.R { background-image: url('./assets/img/white_rook1x.svg'); }
-.N { background-image: url('./assets/img/white_knight1x.svg'); }
-.B { background-image: url('./assets/img/white_bishop1x.svg'); }
-.Q { background-image: url('./assets/img/white_queen1x.svg'); }
-.K { background-image: url('./assets/img/white_king1x.svg'); }
+.p {
+	background-image: url('./assets/img/black_pawn1x.svg');
+}
+.P {
+	background-image: url('./assets/img/white_pawn1x.svg');
+}
+.r {
+	background-image: url('./assets/img/black_rook1x.svg');
+}
+.n {
+	background-image: url('./assets/img/black_knight1x.svg');
+}
+.b {
+	background-image: url('./assets/img/black_bishop1x.svg');
+}
+.q {
+	background-image: url('./assets/img/black_queen1x.svg');
+}
+.k {
+	background-image: url('./assets/img/black_king1x.svg');
+}
+.R {
+	background-image: url('./assets/img/white_rook1x.svg');
+}
+.N {
+	background-image: url('./assets/img/white_knight1x.svg');
+}
+.B {
+	background-image: url('./assets/img/white_bishop1x.svg');
+}
+.Q {
+	background-image: url('./assets/img/white_queen1x.svg');
+}
+.K {
+	background-image: url('./assets/img/white_king1x.svg');
+}
 
 .invalid {
-  opacity: .5;
+	opacity: 0.5;
 }
 
 @media only screen and (max-width: 600px) {
