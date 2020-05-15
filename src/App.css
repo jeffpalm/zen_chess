@@ -1,65 +1,192 @@
+@font-face {
+	font-family: 'DecimalLight';
+	src: url('./assets/fonts/Decimal-Light-Pro.otf') format('opentype');
+}
+@font-face {
+	font-family: 'DecimalBlack';
+	src: url('./assets/fonts/Decimal-Black-Pro.otf') format('opentype');
+}
+@font-face {
+	font-family: 'GothamXNarrow';
+	src: url('./assets/fonts/GothamXNarrow-Bold.otf') format('opentype');
+}
+@font-face {
+	font-family: 'OperatorMonoBook';
+	src: url('./assets/fonts/OperatorMono-Book.otf') format('opentype');
+}
+@font-face {
+	font-family: 'OperatorMonoBookItalic';
+	src: url('./assets/fonts/OperatorMono-BookItalic.otf') format('opentype');
+}
+
 body::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 body {
-  box-sizing: border-box;
+	box-sizing: border-box;
+	font-family: 'DecimalLight';
 }
 
 .App {
-  text-align: center;
-  background-color: lightgray;
-  height: 100vh;
-  width: 100vw;
+	text-align: center;
+	background-color: lightgray;
+	height: 100vh;
+	width: 100vw;
 }
 
 .nav-bar {
-  background-color: darkslategrey;
-  min-height: 80px;
-  width: 100vw;
-  position: fixed;
-  top: 0;
+	opacity: 0.5;
+	max-height: 80px;
+	width: 100vw;
+	position: fixed;
+	top: 0;
 }
 
 .btn {
-  padding: 10px;
-  text-align: center;
-  background-color: powderblue;
-  border-radius: 10px;
-  height: 50px;
+	padding: 10px;
+	text-align: center;
+	background-color: powderblue;
+	border-radius: 10px;
+	height: 50px;
 }
 
 .logo {
-  color: paleturquoise;
+	color: paleturquoise;
+	font-family: 'DecimalLight';
+	font-variant-caps: small-caps;
+	font-size: 5rem;
+	font-weight: 100;
+	text-align: left;
+	padding-left: 10px;
+	z-index: 1;
 }
 
 .flex {
-  display: flex;
+	display: flex;
 }
 
 .center {
-  justify-content: center;
+	justify-content: center;
 }
 
 .mid {
-  align-items: center;
+	align-items: center;
 }
 
 .around {
-  justify-content: space-around;
+	justify-content: space-around;
 }
 
 .col {
-  flex-direction: column;
-  align-items: center;
+	flex-direction: column;
+	align-items: center;
 }
 
+.Square {
+	width: 12.5%;
+	height: 12.5%;
+	flex-direction: column-reverse;
+  align-items: baseline;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: .2s;
+}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Square:hover{
+	cursor: pointer;
+	opacity: .8;
+		box-shadow: 0 0 10px 3px black;
+		background-size: 120%;
+		background-position: ;
+}
+
+.Square-text {
+	font-size: 12px;
+	padding: 3px;
+	color: lightgray;
+}
+
+.light {
+	background-color: wheat;
+}
+
+.dark {
+	background-color: saddlebrown;
+}
+
+.piece-image {
+  height: 100%;
+  width: 100%;
+}
+
+.Board {
+	width: 70vw;
+	min-width: 400px;
+	height: 70vw;
+	min-height: 400px;
+	max-height: 90vh;
+	max-width: 90vh;
+	flex-wrap: wrap;
+	z-index: 2;
+  flex-direction: row-reverse;
+  border: 1px solid gray;
+  box-shadow: grey 1px 1px 50px;
+}
+
+.Board:after {
+	content: '';
+	padding-bottom: 100%;
+}
+
+.markers {
+  font-size: 1.2rem;
+  font-family: "OperatorMonoBook";
+}
+
+.Files {
+  width: 70vw;
+  min-width: 400px;
+  max-width: 90vh;
+  height: 20px;
+}
+
+.File-marker {
+  width: 12.5%;
+  margin-top: 5px;
+}
+
+.Ranks {
+  height: 70vw;
+  min-height: 400px;
+  max-height: 90vh;
+}
+
+.Rank-marker {
+  height: 12.5%;
+  margin-right: 8px;
+}
+
+.p { background-image: url('./assets/img/black_pawn1x.svg'); }
+.P { background-image: url('./assets/img/white_pawn1x.svg'); }
+.r { background-image: url('./assets/img/black_rook1x.svg'); }
+.n { background-image: url('./assets/img/black_knight1x.svg'); }
+.b { background-image: url('./assets/img/black_bishop1x.svg'); }
+.q { background-image: url('./assets/img/black_queen1x.svg'); }
+.k { background-image: url('./assets/img/black_king1x.svg'); }
+.R { background-image: url('./assets/img/white_rook1x.svg'); }
+.N { background-image: url('./assets/img/white_knight1x.svg'); }
+.B { background-image: url('./assets/img/white_bishop1x.svg'); }
+.Q { background-image: url('./assets/img/white_queen1x.svg'); }
+.K { background-image: url('./assets/img/white_king1x.svg'); }
+
+.invalid {
+  opacity: .5;
+}
+
+@media only screen and (max-width: 600px) {
+	.logo {
+		text-align: center;
+		font-size: 4rem;
+	}
 }
