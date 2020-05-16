@@ -18,6 +18,7 @@
 	font-family: 'OperatorMonoBookItalic';
 	src: url('./assets/fonts/OperatorMono-BookItalic.otf') format('opentype');
 }
+@import url('https://fonts.googleapis.com/css2?family=Poiret+One&display=swap');
 
 body::-webkit-scrollbar {
 	display: none;
@@ -28,6 +29,21 @@ body {
 	font-family: 'DecimalLight';
 }
 
+h1 {
+	font-size: 8em;
+	color: lightblue;
+
+}
+
+.po {
+	font-family: 'Poiret One';
+}
+
+.none {
+	background-color: none;
+	border: none;
+}
+
 .App {
 	text-align: center;
 	background-color: lightgray;
@@ -35,20 +51,72 @@ body {
 	width: 100vw;
 }
 
-.nav-bar {
-	opacity: 0.5;
-	max-height: 80px;
-	width: 100vw;
+.SideNav {
 	position: fixed;
+	left: 0;
 	top: 0;
+	height: 100vh;
+	width: 20vw;
+	background-color: darkslategray;
+	transition: 500ms;
+	flex-direction: column-reverse;
+	align-items: center;
 }
 
-.btn {
+.sn-collapse {
+	width: 5vw;
+}
+
+.sn-toggle-btn {
+	position: absolute;
+	right: 10px;
+	top: -30px;
+	background: none;
+	border: none;
+	color: lightblue;
+	font-size: 8rem;
+}
+
+.sn-toggle-btn:hover {
+	cursor: pointer;
+	animation: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s infinite alternate right-left;
+	
+}
+
+@keyframes right-left {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-10px);
+	}
+}
+@-webkit-keyframes right-left {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-10px);
+	}
+}
+
+.SideNav-btn {
 	padding: 10px;
 	text-align: center;
 	background-color: powderblue;
 	border-radius: 10px;
 	height: 50px;
+	width: 80%;
+	border: none;
+	color: darkslategray;
+	font-size: 1.5rem;
+	margin-top: 10px;
+	transition: all .3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.SideNav-btn:hover {
+	cursor: pointer;
+	box-shadow: 0 0 20px 0 rgba(0,0,0,0.7)
 }
 
 .logo {
@@ -90,14 +158,18 @@ body {
 	align-items: baseline;
 	background: contain;
 	background-repeat: no-repeat;
-	transition: 0.2s;
+	transition: .3s;
+	background-size: 90%;
+	background-origin: border-box;
+	background-position: bottom 5px center;
 }
 
 .Square:hover {
 	cursor: pointer;
 	opacity: 0.8;
-	box-shadow: 0 0 10px 3px black;
-	background-position: 0px -10px;
+	box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.7);
+	background-size: 100%;
+	background-position: bottom 2px center;
 }
 
 .Square-text {
@@ -107,11 +179,15 @@ body {
 }
 
 .light {
-	background-color: wheat;
+	background-color: lightgrey;
+}
+
+.inset:hover {
+	box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.7);
 }
 
 .dark {
-	background-color: saddlebrown;
+	background-color: darkslategrey;
 }
 
 .piece-image {
@@ -131,6 +207,16 @@ body {
 	flex-direction: row-reverse;
 	border: 1px solid gray;
 	box-shadow: grey 1px 1px 50px;
+	transition: 1.5s;
+	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+.wht {
+	transform: rotate(0deg);
+}
+
+.blk {
+	transform: rotate(180deg);
 }
 
 .Board:after {
@@ -159,6 +245,7 @@ body {
 	height: 70vw;
 	min-height: 400px;
 	max-height: 90vh;
+	transition: 1s;
 }
 
 .Rank-marker {
