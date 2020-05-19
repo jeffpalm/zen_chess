@@ -1,93 +1,32 @@
+// Chess board object to keep track of current game
+// ID matches up to cb array coordinates
 const board = require('./data/chess_board.json')
+// Object containing direction conversion for move determination
 const dir = require('./data/directions.json')
+// Reference to order in which Front end chess board is rendered
+const drawOrder = require('./data/board_draw_order.json')
+// Array representing chess board to convert coordinates to square names and vice versa
+const cb = require('./data/chess_board_array.json')
 
 class ZenChess {
 	constructor(fen) {
 		this.fen = fen
+		// External Guides for reference
 		this.dir = JSON.parse(JSON.stringify(dir))
+		this.boardDrawOrder = JSON.parse(JSON.stringify(drawOrder))
+		this.cbIndex = JSON.parse(JSON.stringify(cb))
 		this.board = JSON.parse(JSON.stringify(board))
+		// Props used to construct FEN
 		this.pieces = ''
 		this.sideToMove = ''
 		this.castlingAbility = ''
 		this.enPassantTarget = ''
 		this.halfMoveClock = ''
 		this.fullMoveCount = ''
-		this.boardDrawOrder = [
-			'a8',
-			'b8',
-			'c8',
-			'd8',
-			'e8',
-			'f8',
-			'g8',
-			'h8',
-			'a7',
-			'b7',
-			'c7',
-			'd7',
-			'e7',
-			'f7',
-			'g7',
-			'h7',
-			'a6',
-			'b6',
-			'c6',
-			'd6',
-			'e6',
-			'f6',
-			'g6',
-			'h6',
-			'a5',
-			'b5',
-			'c5',
-			'd5',
-			'e5',
-			'f5',
-			'g5',
-			'h5',
-			'a4',
-			'b4',
-			'c4',
-			'd4',
-			'e4',
-			'f4',
-			'g4',
-			'h4',
-			'a3',
-			'b3',
-			'c3',
-			'd3',
-			'e3',
-			'f3',
-			'g3',
-			'h3',
-			'a2',
-			'b2',
-			'c2',
-			'd2',
-			'e2',
-			'f2',
-			'g2',
-			'h2',
-			'a1',
-			'b1',
-			'c1',
-			'd1',
-			'e1',
-			'f1',
-			'g1',
-			'h1'
-		]
-		this.cbIndex = [
-			['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'],
-			['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8'],
-			['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'],
-			['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8'],
-			['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8'],
-			['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8'],
-			['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'],
-			['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8']
-		]
+		// List of valid moves for sideToMove
+		this.currentValidMoves = []
+		// List of valid moves for opposite side to use in kingMove logic
+		this.prevValidMoves = []
 	}
 	// Initializes game and populates property values based on FEN
 	init = () => {
@@ -205,9 +144,9 @@ class ZenChess {
 				return
 			} else if (curPiece && counter === 0) {
 				counter++
-				output.push({ newSq: e, type: 'atk' })
+				output.push({ newSq: e, type: 'atk', origin: square })
 			} else if (counter === 0) {
-				output.push({ newSq: e, type: 'move' })
+				output.push({ newSq: e, type: 'move', origin: square })
 			}
 		})
 		return output
@@ -215,6 +154,7 @@ class ZenChess {
 		// If diagnoal
 	}
 
+	// Returns an array of objects representing valid knight moves
 	knightMoves = (xS, yS) => {
 		const moves = [
 			[1, 2],
@@ -236,48 +176,145 @@ class ZenChess {
 		const output = []
 
 		movesConv.map(e => {
-			const { occupiedBy, curPiece } = this.board.find(f => f.square === e)
+			const index = this.board.findIndex(f => e === f.square)
+			const { occupiedBy, curPiece } = this.board[index]
 			if (occupiedBy === this.sideToMove) {
 				return
 			} else if (curPiece) {
-				output.push({ newSq: e, type: 'atk' })
+				output.push({ newSq: e, type: 'atk', origin: this.coordConv(xS, yS) })
 			} else {
-				output.push({ newSq: e, type: 'move' })
+				output.push({ newSq: e, type: 'move', origin: this.coordConv(xS, yS) })
 			}
 		})
 
 		return output
 	}
 
+	// Returns an array of objects representing valid pawn moves
 	pawnMoves = (xS, yS, color) => {
 		const output = []
+		const ept = this.enPassantTarget
+		const origin = this.coordConv(xS, yS)
 		switch (color) {
 			case 'w':
-				// Possibility One
-				const mOneName = this.coordConv(xS, yS + 1)
-				const mOnePiece = this.getPiece(mOneName)
+				//#region WHITE PAWN MOVES
+				const wMOneName = this.coordConv(xS, yS + 1)
+				const wMOnePiece = this.getPiece(wMOneName)
 				if (yS + 1 < 7) {
-					if (!mOnePiece){
+					if (!wMOnePiece) {
 						// If curPiece is BLANK
-						output.push({ newSq: mOneName, type: 'move' })
+						output.push({ newSq: wMOneName, type: 'move', origin })
 						if (yS === 1) {
 							// If Pawn still on starting rank
-							const mTwoName = this.coordConv(xS, yS + 2)
-							const mTwoPiece = this.getPiece(mTwoName)
-							if (!mTwoPiece){
-								output.push({ newSq: mTwoName, type: 'move'})
+							const wMTwoName = this.coordConv(xS, yS + 2)
+							const wMTwoPiece = this.getPiece(wMTwoName)
+							if (!wMTwoPiece) {
+								output.push({ newSq: wMTwoName, type: 'move', origin })
 							}
 						}
-						
 					}
-				} else if (yS + 1 === 7){
-					output.push({newSq: mOneName, type: 'promo'})
+				} else if (yS + 1 === 7 && !wMOnePiece) {
+					output.push({ newSq: wMOneName, type: 'promo', origin })
 				}
-				
+
+				// Pawn Attack Moves
+				const wAOneName = this.coordConv(xS + 1, yS + 1)
+				const wAOnePiece = this.getPiece(wAOneName)
+				const wATwoName = this.coordConv(xS - 1, yS + 1)
+				const wATwoPiece = this.getPiece(wATwoName)
+				// Check if piece is occupying attack square 1
+				if (wAOnePiece) {
+					// Check if piece is black
+					if (wAOnePiece === wAOnePiece.toLowerCase()) {
+						output.push({
+							newSq: wAOneName,
+							// Check if attack is promo square
+							type: yS + 1 === 7 ? 'atk promo' : 'atk',
+							origin
+						})
+					}
+				}
+				// Check if piece is occupying attack square 2
+				if (wATwoPiece) {
+					// Check if piece is black
+					if (wATwoPiece === wAOnePiece.toLowerCase()) {
+						output.push({
+							newSq: wATwoName,
+							// Check if attack is promo square
+							type: yS + 1 === 7 ? 'atk promo' : 'atk',
+							origin
+						})
+					}
+				}
+				// Checks en Passant target
+				if (wAOneName === ept || wATwoName === ept) {
+					output.push({ newSq: ept, type: 'atk', origin })
+				}
+				//#endregion
+				break
+
+			case 'b':
+				//#region BLACK PAWN MOVES
+				const bMOneName = this.coordConv(xS, yS - 1)
+				const bMOnePiece = this.getPiece(bMOneName)
+				if (yS - 1 >= 0) {
+					if (!bMOnePiece) {
+						// If curPiece is BLANK
+						output.push({ newSq: bMOneName, type: 'move', origin })
+						if (yS === 6) {
+							// If Pawn still on starting rank
+							const bMTwoName = this.coordConv(xS, yS - 2)
+							const bMTwoPiece = this.getPiece(bMTwoName)
+							if (!bMTwoPiece) {
+								output.push({ newSq: bMTwoName, type: 'move', origin })
+							}
+						}
+					}
+				} else if (yS - 1 === 0 && !bMOnePiece) {
+					output.push({ newSq: bMOneName, type: 'promo', origin })
+				}
+
+				// Pawn Attack Moves
+				const bAOneName = this.coordConv(xS + 1, yS - 1)
+				const bAOnePiece = this.getPiece(bAOneName)
+				const bATwoName = this.coordConv(xS - 1, yS - 1)
+				const bATwoPiece = this.getPiece(bATwoName)
+				// Check if piece is occupying attack square 1
+				if (bAOnePiece) {
+					// Check if piece is white
+					if (bAOnePiece === bAOnePiece.toUpperCase()) {
+						output.push({
+							newSq: bAOneName,
+							// Check if attack is promo square
+							type: yS - 1 === 0 ? 'atk promo' : 'atk',
+							origin
+						})
+					}
+				}
+				// Check if piece is occupying attack square 2
+				if (bATwoPiece) {
+					// Check if piece is black
+					if (bATwoPiece === bATwoPiece.toUpperCase()) {
+						output.push({
+							newSq: bATwoName,
+							// Check if attack is promo square
+							type: yS - 1 === 0 ? 'atk promo' : 'atk',
+							origin
+						})
+					}
+				}
+				// Checks en Passant target
+				if (bAOneName === ept || bATwoName === ept) {
+					output.push({ newSq: ept, type: 'atk', origin })
+				}
+				//#endregion
+				break
 		}
+		return output
 	}
 
 	// Returns an array of objects representing valid moves from a particular space
+	// Dependancies: coordConv, sqCoord, getPiece, oneDirection, knightMoves, pawnMoves
 	validMoves = square => {
 		const sqCoords = this.sqCoord(square)
 			.split('')
@@ -302,7 +339,7 @@ class ZenChess {
 			case 'n':
 			case 'N':
 				//#region Knight Moves
-				arr.push(this.knightMoves(xS, xY))
+				arr.push(this.knightMoves(xS, yS))
 				//#endregion
 				break
 
@@ -331,84 +368,82 @@ class ZenChess {
 				for (let d in this.dir) {
 					arr.push(od(square, d, 1))
 				}
+				// filter out illegal king moves
+				arr = arr.filter(e => this.prevValidMoves.findIndex(f => f.square === e.newSq) === -1)
 				//#endregion
 				break
 
 			case 'P':
 				//#region White Pawn Moves
-				yS === 1 ? arr.push(od(square, 'n', 2)) : arr.push(od(square, 'n', 1))
-
-				arr = arr.filter(e => e.type !== 'move')
-
-				const { newSq: a1 } = od(square, 'nw', 1)
-				if (this.board.find(e => e.square === a1)) {
-					const { occupiedBy: a1Occ, curPiece: a1p } = this.board.find(e => e.square === a1)
-					if (a1Occ !== this.sideToMove) {
-						if (this.enPassantTarget === a1) {
-							arr.push({ newSq: a1, type: 'atk' })
-						} else if (a1p) {
-							arr.push({ newSq: a1, type: 'atk' })
-						}
-					}
-				}
-
-				const { newSq: a2 } = od(square, 'ne', 1)
-				if (this.board.find(e => e.square === a2)) {
-					const { occupiedBy: a2Occ, curPiece: a2p } = this.board.find(e => e.square === a2)
-
-					if (a2Occ !== this.sideToMove) {
-						if (this.enPassantTarget === a2) {
-							arr.push({ newSq: a2, type: 'atk' })
-						} else if (a2p) {
-							arr.push({ newSq: a2, type: 'atk' })
-						}
-					}
-				}
+				arr.push(this.pawnMoves(xS, yS, 'w'))
 
 				//#endregion
 				break
 
 			case 'p':
 				//#region Black Pawn Moves
-				yS === 6 ? arr.push(od(square, 's', 2)) : arr.push(od(square, 's', 1))
-
-				arr = arr.filter(e => e.type !== 'move')
-
-				const { newSq: a3 } = od(square, 'sw', 1)
-				if (this.board.find(e => e.square === a3)) {
-					const { occupiedBy: a3Occ, curPiece: a3p } = this.board.find(e => e.square === a3)
-					if (a3Occ !== this.sideToMove) {
-						if (this.enPassantTarget === a3) {
-							arr.push({ newSq: a3, type: 'atk' })
-						} else if (a3p) {
-							arr.push({ newSq: a3, type: 'atk' })
-						}
-					}
-				}
-
-				const { newSq: a4 } = od(square, 'se', 1)
-				if (this.board.find(e => e.square === a4)) {
-					const { occupiedBy: a4Occ, curPiece: a4p } = this.board.find(e => e.square === a4)
-
-					if (a4Occ !== this.sideToMove) {
-						if (this.enPassantTarget === a4) {
-							arr.push({ newSq: a4, type: 'atk' })
-						} else if (a4p) {
-							arr.push({ newSq: a4, type: 'atk' })
-						}
-					}
-				}
+				arr.push(this.pawnMoves(xS, yS, 'b'))
 				//#endregion
 				break
 		}
 
 		return arr.flat()
 	}
+
+	// Returns an array of objects representing all valid moves for the position
+	curValidMoves = () => {
+		// filter only squares occupied by sideToMove pieces
+		// map over filtered array to return a list of square names to feed into valid moves
+		// flatten map
+		// filter out any blanks
+		return this.board
+			.filter(e => e.occupiedBy === this.sideToMove)
+			.map(f => this.validMoves(f.square))
+			.flat()
+			.filter(g => g !== '')
+	}
+
+	
+	/*  To-do
+			- Further testing on curValidMoves method
+				+ Test if king moves are valid
+				+ Debug
+			- add curValidMoves to init method
+				+ Should update currentValidMoves prop
+			- fenEncoder() method
+				+ Converts following properties to FEN
+					- pieces
+					- sideToMove
+					- castlingAbility
+					- enPassantTarget
+					- halfMoveClock
+					- fullMoveCounter
+				+ Stores output in this.fen
+			- move(square) method
+				+ origin prePiece = curPiece
+				+ origin curPiece = ''
+				+ newSq prePiece = curPiece
+				+ newSq curPiece = origin curPiece
+				+ run curValidMoves() save to prevValidMoves prop
+				+ THEN change sideToMove()
+				+ run curValidMoves() save to currentValidMoves prop
+				+ Update props:
+					- pieces
+					- sideToMove
+					- castlingAbility
+					- enPassantTarget
+					- halfMoveClock
+					- fullMoveCount
+				+ call fenEncoder() to update this.fen
+			- update api calls in app to new server port
+			- wire up front-end
+	*/
 }
 
-// const game = new ChessGame('8/4B3/2K3p1/1P3p2/5P2/8/3k4/5b2 b - - 7 44')
-const game = new ZenChess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-// const game = new ChessGame('r3k1r1/ppR2p2/4p3/1p2P3/3P2p1/6Q1/P2q2P1/2R3K1 w q - 1 2')
+// const game = new ZenChess('8/4B3/2K3p1/1P3p2/5P2/8/3k4/5b2 b - - 7 44')
+const game = new ZenChess('rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N1B3/PPP2PPP/R2QKB1R b KQkq - 1 6')
+// const game = new ZenChess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+// const game = new ZemChess('r3k1r1/ppR2p2/4p3/1p2P3/3P2p1/6Q1/P2q2P1/2R3K1 w q - 1 2')
 
 game.init()
 
@@ -428,6 +463,6 @@ game.init()
 // 	game.board.filter(e => e.occupiedBy === game.sideToMove).map(f => game.validMoves(f.square))
 // )
 
-console.log(game.getPiece('g3'))
+console.log(game.curValidMoves())
 
 // module.exports = ZenChess
