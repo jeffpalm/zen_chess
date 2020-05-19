@@ -10,7 +10,7 @@ export default class Ranks extends Component {
                 </div>
             )
         }
-        return output
+        return output.reverse()
     }
     render() {
         return (

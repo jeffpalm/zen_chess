@@ -204,11 +204,23 @@ h1 {
 	max-width: 90vh;
 	flex-wrap: wrap;
 	z-index: 2;
-	flex-direction: row-reverse;
+	flex-direction: row;
 	border: 1px solid gray;
 	box-shadow: grey 1px 1px 50px;
 	transition: 1.5s;
 	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+.invalid {
+	opacity: .5;
+}
+
+.attack {
+	background: rgba(250, 0, 0, 0.5);
+}
+
+.move {
+	background: rgba(0, 241, 12, 0.418)
 }
 
 .wht {

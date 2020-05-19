@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import Square from './Square'
 import Files from './Files'
 import Ranks from './Ranks'
@@ -8,30 +9,82 @@ export default class Board extends Component {
 		super(props)
 
 		this.state = {
-			rank: [8, 7, 6, 5, 4, 3, 2, 1],
-			file: ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'],
+			file: [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ],
+			board: {},
+			drawOrder: [
+				'a8',
+				'b8',
+				'c8',
+				'd8',
+				'e8',
+				'f8',
+				'g8',
+				'h8',
+				'a7',
+				'b7',
+				'c7',
+				'd7',
+				'e7',
+				'f7',
+				'g7',
+				'h7',
+				'a6',
+				'b6',
+				'c6',
+				'd6',
+				'e6',
+				'f6',
+				'g6',
+				'h6',
+				'a5',
+				'b5',
+				'c5',
+				'd5',
+				'e5',
+				'f5',
+				'g5',
+				'h5',
+				'a4',
+				'b4',
+				'c4',
+				'd4',
+				'e4',
+				'f4',
+				'g4',
+				'h4',
+				'a3',
+				'b3',
+				'c3',
+				'd3',
+				'e3',
+				'f3',
+				'g3',
+				'h3',
+				'a2',
+				'b2',
+				'c2',
+				'd2',
+				'e2',
+				'f2',
+				'g2',
+				'h2',
+				'a1',
+				'b1',
+				'c1',
+				'd1',
+				'e1',
+				'f1',
+				'g1',
+				'h1'
+			],
 			dark: 'dark',
 			light: 'light',
+			curPos: [],
+			moves: [],
+			preMove: false
 		}
-	}
-
-	// Returns an array with length of 64 with pieces on the board of a current position
-	// This array matches up with the drawBoard() array.
-
-	fenParser() {
-		let output = []
-		const { fen } = this.props
-		const pieces = fen.substring(0, fen.indexOf(' '))
-		pieces.split('').map((e, i) => {
-			if (parseInt(e)) {
-				for (let j = 0; j < parseInt(e); j++) {
-					output.push('')
-				}
-			} else if (e !== '/') {
-				output.push(e)
-			}
-		})
-		return output
+		this.drawBoard = this.drawBoard.bind(this)
+		this.preMove = this.preMove.bind(this)
 	}
 
 	// Iterates through the rank and file arrays in state to draw the board in a way
@@ -39,35 +92,69 @@ export default class Board extends Component {
 
 	drawBoard() {
 		let output = []
-		let sqCount = 0
-		const pieces = this.fenParser()
-		const { rank, file, dark, light } = this.state
-		for (let i = 0; i < 8; i++) {
-			for (let j = 0; j < 8; j++) {
-				let iE = i % 2 === 0 // i is even = true | odd = false
-				let jE = j % 2 === 0 // j is even = true | odd = false
+		const { drawOrder, dark, light, moves, preMove, board, curPos } = this.state
+		for (let i = 0; i < drawOrder.length; i++) {
+			const sqName = drawOrder[i]
+			const isValidMove = moves.find(e => e.newSq === sqName)
+			let type = 'passive'
+			if (preMove) {
+				type = 'invalid'
+				if (isValidMove) type = isValidMove.type
+			}
+			if (curPos) {
 				output.push(
 					<Square
+						preMove={this.preMove}
+						moveType={type}
 						rot={this.props.rot}
-						piece={pieces[sqCount++]}
-						key={file[j] + rank[i]}
-						file={file[j]}
-						rank={rank[i]}
-						color={(iE && jE) || (!iE && !jE) ? dark : light}
+						piece={curPos[i]}
+						key={sqName}
+						color={board[sqName] ? board[sqName].color : light}
+						square={sqName}
+					/>
+				)
+			} else {
+				output.push(
+					<Square
+						preMove={this.preMove}
+						moveType={type}
+						rot={this.props.rot}
+						piece=''
+						key={sqName}
+						color={board[sqName] ? board[sqName].color : dark}
+						square={sqName}
 					/>
 				)
 			}
 		}
 		return output
 	}
-	
+
+	preMove(e) {
+		const postBody = { square: e.target.id }
+		axios
+			.post('http://localhost:3500/game/moves', postBody)
+			.then(res => this.setState({ moves: res.data.moves, preMove: true }))
+			.catch(err => console.log(err))
+	}
+
+	componentDidMount() {
+		const postBody = { fen: this.props.fen }
+		axios
+			.post('http://localhost:3500/game', postBody)
+			.then(res => this.setState({ curPos: res.data.pos, board: res.data.board}))
+			.catch(err => console.log(err))
+	}
+
 	render() {
+		const board = this.drawBoard()
+		console.log(this.state)
 		const { rot } = this.props
 		return (
 			<div className={'flex Ranks ' + rot}>
 				<Ranks />
 				<div className='Board flex'>
-					{this.drawBoard()}
+					{board}
 					<Files fileNames={this.state.file} />
 				</div>
 			</div>

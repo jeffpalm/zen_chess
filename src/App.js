@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import Header from './components/Header'
-import SideNav from './components/SideNav'
+// import Header from './components/Header'
+// import SideNav from './components/SideNav'
 import Board from './components/Board'
-import Button from './components/Button'
+// import Button from './components/Button'
 import './reset.css'
 import './App.css'
 
@@ -14,10 +14,10 @@ export default class App extends Component {
 			fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 			active: 'w',
 			castling: 'KQkq',
-			enPassantTarget: [],
+			enPassantTarget: '',
 			halfMoveClock: 0,
 			fullMoveClock: 1,
-			rot: 'wht'
+			rot: 'wht',
 		}
 
 		this.uniUpdate = this.uniUpdate.bind(this)
