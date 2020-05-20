@@ -23,10 +23,12 @@ class ZenChess {
 		this.enPassantTarget = ''
 		this.halfMoveClock = ''
 		this.fullMoveCount = ''
-		// List of valid moves for sideToMove
-		this.currentValidMoves = []
-		// List of valid moves for opposite side to use in kingMove logic
-		this.prevValidMoves = []
+		// List of Current Valid Moves for sideToMove
+		this.cvm = []
+		// List of Previous Valid Moves for opposite side to use in kingMove logic
+		this.pvm = []
+		// Captured pieces
+		this.captures = []
 	}
 	// Initializes game and populates property values based on FEN
 	init = () => {
@@ -68,6 +70,17 @@ class ZenChess {
 		this.enPassantTarget = this.fen.substring(wi[2] + 1, wi[3])
 		this.halfMoveClock = this.fen.substring(wi[3] + 1, wi[4])
 		this.fullMoveCount = this.fen.substring(wi[4] + 1, this.fen.length)
+		this.cvm = this.curValidMoves()
+
+		if (this.sideToMove === 'w') {
+			this.sideToMove = 'b'
+			this.pvm = this.curValidMoves()
+			this.sideToMove = 'w'
+		} else {
+			this.sideToMove = 'w'
+			this.pvm = this.curValidMoves()
+			this.sideToMove = 'b'
+		}
 	}
 	// Converts starting square and offset coordinates into square name
 	coordConv = (x, y) => {
@@ -369,7 +382,31 @@ class ZenChess {
 					arr.push(od(square, d, 1))
 				}
 				// filter out illegal king moves
-				arr = arr.filter(e => this.prevValidMoves.findIndex(f => f.square === e.newSq) === -1)
+				arr = arr.filter(e => this.pvm.findIndex(f => f.square === e.newSq) === -1)
+
+				// handle castling
+				// White Kingside index
+				const wKs = this.castlingAbility.indexOf('K')
+				// White Queenside index
+				const wQs = this.castlingAbility.indexOf('Q')
+				// Black Kingside index
+				const bKs = this.castlingAbility.indexOf('k')
+				// Black Queenside index
+				const bQs = this.castlingAbility.indexOf('q')
+
+				if (wKs !== -1 && !this.board[40].curPiece && !this.board[48].curPiece) {
+					arr.push({newSq: 'g1', type: 'move castle', origin: 'e1', castle: 'f1'})
+				}
+				if (wQs !== -1 && !this.board[24].curPiece && !this.board[16].curPiece && !this.board[8].curPiece) {
+					arr.push({newSq: 'c1', type: 'move castle', origin: 'e1', castle: 'd1'})
+				}
+				
+				if (bKs !== -1 && !this.board[47].curPiece && !this.board[55].curPiece) {
+					arr.push({newSq: 'g8', type: 'move castle', origin: 'e8', castle: 'f8'})
+				}
+				if (bQs !== -1 && !this.board[31].curPiece && !this.board[23].curPiece && !this.board[15].curPiece) {
+					arr.push({newSq: 'c8', type: 'move castle', origin: 'e8', castle: 'd8'})
+				}
 				//#endregion
 				break
 
@@ -403,22 +440,116 @@ class ZenChess {
 			.filter(g => g !== '')
 	}
 
-	
+	// Takes current props and converts to FEN
+	fenEncoder = () => {
+		let output
+		let blankCount = 0
+		output = this.pieces.reduce((acc, cur, i) => {
+			if (cur) {
+				if ((i + 1) % 8 === 0) {
+					if (blankCount === 0) {
+						return `${acc}${cur}/`
+					} else {
+						acc = `${acc}${blankCount}${cur}/`
+						blankCount = 0
+						return acc
+					}
+				} else {
+					if (blankCount === 0) {
+						return acc + cur
+					} else {
+						acc = `${acc}${blankCount}${cur}`
+						blankCount = 0
+						return acc
+					}
+				}
+			} else {
+				if ((i + 1) % 8 === 0) {
+					acc = `${acc}${++blankCount}/`
+					blankCount = 0
+					return acc
+				} else {
+					blankCount++
+					return acc
+				}
+			}
+		}, '')
+		output = output.substring(0, output.length - 1)
+		output = `${output} ${this.sideToMove} ${this.castlingAbility} ${this.enPassantTarget} ${this.halfMoveClock} ${this.fullMoveCount}`
+		return output
+	}
+
+	// Moves in pure coordinate notation
+	// <from square><to square>[<promoted to>]
+	move = move => {
+		// From square
+		const fS = move.substring(0, 2)
+		// From square piece
+		const fSP = this.getPiece(fS)
+		// From square index in board array
+		const fSI = this.board.findIndex(e => e.square === fS)
+		// To square
+		const tS = move.substring(2, 4)
+		// To square Piece
+		const tSP = this.getPiece(tS)
+		// To square index
+		const tSI = this.board.findIndex(e => e.square === tS)
+
+		this.board[fSI].prePiece = fSP
+		this.board[fSI].curPiece = ''
+		this.board[fSI].occupiedBy = ''
+		this.board[tSI].prePiece = tSP
+		this.board[tSI].curPiece = fSP
+		this.board[tSI].occupiedBy = this.sideToMove
+		this.board[tSI].cPMoveCount = +this.board[fSI].cPMoveCount + 1
+		
+		if (tSP) this.captures.push(tSP)
+
+		this.pvm = this.curValidMoves()
+		
+		this.pieces = this.boardDrawOrder.map(e => this.getPiece(e))
+
+		if (this.sideToMove === 'w') {
+			this.sideToMove = 'b'
+		} else {
+			this.sideToMove = 'w'
+			this.fullMoveCount++
+		}
+
+		this.cvm = this.curValidMoves()
+
+		// Handle castling
+		// White
+		let castling
+		// 0 = Queen side, 56 = King side, 32 = King starting square
+		const wCastlingIndicies = [0, 32, 56]
+		const wKingStart = this.board[32]
+		const wKingSideRook = this.board[56]
+		const wQueenSideRook = this.board[0]
+		
+
+		// Black
+		//
+		const bCastlingIndicies = [7, 39, 63]
+		const bKingStart = this.board[39]
+		const bKingSideRook = this.board[63]
+		const bQueenSideRook = this.board[7]
+		
+		// Handle promotion
+
+		// Handle en Passant
+
+		// Handle halfMoveClock
+
+		// Handle fullMoveCount
+		
+	}
+
 	/*  To-do
 			- Further testing on curValidMoves method
 				+ Test if king moves are valid
 				+ Debug
-			- add curValidMoves to init method
-				+ Should update currentValidMoves prop
-			- fenEncoder() method
-				+ Converts following properties to FEN
-					- pieces
-					- sideToMove
-					- castlingAbility
-					- enPassantTarget
-					- halfMoveClock
-					- fullMoveCounter
-				+ Stores output in this.fen
+				+ Add castling
 			- move(square) method
 				+ origin prePiece = curPiece
 				+ origin curPiece = ''
@@ -428,12 +559,12 @@ class ZenChess {
 				+ THEN change sideToMove()
 				+ run curValidMoves() save to currentValidMoves prop
 				+ Update props:
-					- pieces
-					- sideToMove
-					- castlingAbility
+					- pieces X
+					- sideToMove X
+					- castlingAbility 
 					- enPassantTarget
 					- halfMoveClock
-					- fullMoveCount
+					- fullMoveCount X
 				+ call fenEncoder() to update this.fen
 			- update api calls in app to new server port
 			- wire up front-end
@@ -463,6 +594,8 @@ game.init()
 // 	game.board.filter(e => e.occupiedBy === game.sideToMove).map(f => game.validMoves(f.square))
 // )
 
-console.log(game.curValidMoves())
+// console.log(game.curValidMoves())
+console.log(game.fenEncoder())
+console.log(game.board[39])
 
 // module.exports = ZenChess
