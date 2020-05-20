@@ -17,9 +17,14 @@ class ZenChess {
 		this.cbIndex = JSON.parse(JSON.stringify(cb))
 		this.board = JSON.parse(JSON.stringify(board))
 		// Props used to construct FEN
+		this.moves = []
 		this.pieces = ''
 		this.sideToMove = ''
-		this.castlingAbility = ''
+		this.castlingAbility = `${this.K}${this.Q}${this.k}${this.q}`
+		this.K = 'K'
+		this.Q = 'Q'
+		this.k = 'k'
+		this.q = 'q'
 		this.enPassantTarget = ''
 		this.halfMoveClock = ''
 		this.fullMoveCount = ''
@@ -395,17 +400,27 @@ class ZenChess {
 				const bQs = this.castlingAbility.indexOf('q')
 
 				if (wKs !== -1 && !this.board[40].curPiece && !this.board[48].curPiece) {
-					arr.push({newSq: 'g1', type: 'move castle', origin: 'e1', castle: 'f1'})
+					arr.push({ newSq: 'g1', type: 'move castle', origin: 'e1', castle: 'f1', cOrigin: 'h1' })
 				}
-				if (wQs !== -1 && !this.board[24].curPiece && !this.board[16].curPiece && !this.board[8].curPiece) {
-					arr.push({newSq: 'c1', type: 'move castle', origin: 'e1', castle: 'd1'})
+				if (
+					wQs !== -1 &&
+					!this.board[24].curPiece &&
+					!this.board[16].curPiece &&
+					!this.board[8].curPiece
+				) {
+					arr.push({ newSq: 'c1', type: 'move castle', origin: 'e1', castle: 'd1', cOrigin: 'a1' })
 				}
-				
+
 				if (bKs !== -1 && !this.board[47].curPiece && !this.board[55].curPiece) {
-					arr.push({newSq: 'g8', type: 'move castle', origin: 'e8', castle: 'f8'})
+					arr.push({ newSq: 'g8', type: 'move castle', origin: 'e8', castle: 'f8', cOrigin: 'h8' })
 				}
-				if (bQs !== -1 && !this.board[31].curPiece && !this.board[23].curPiece && !this.board[15].curPiece) {
-					arr.push({newSq: 'c8', type: 'move castle', origin: 'e8', castle: 'd8'})
+				if (
+					bQs !== -1 &&
+					!this.board[31].curPiece &&
+					!this.board[23].curPiece &&
+					!this.board[15].curPiece
+				) {
+					arr.push({ newSq: 'c8', type: 'move castle', origin: 'e8', castle: 'd8', cOrigin: 'a8' })
 				}
 				//#endregion
 				break
@@ -480,33 +495,36 @@ class ZenChess {
 	}
 
 	// Moves in pure coordinate notation
-	// <from square><to square>[<promoted to>]
-	move = move => {
+	// <from square><to square>[<promoted to>]	
+	// Must pass empty object at a minimum
+	move = (move, {castle, cOrigin, promo}) => {
+		this.moves.push({move, castle, cOrigin, promo})
 		// From square
-		const fS = move.substring(0, 2)
+		const fromSq = move.substring(0, 2)
 		// From square piece
-		const fSP = this.getPiece(fS)
+		const fromSqP = promo ? promo : this.getPiece(fromSq)
 		// From square index in board array
-		const fSI = this.board.findIndex(e => e.square === fS)
+		const fromSqI = this.board.findIndex(e => e.square === fromSq)
 		// To square
-		const tS = move.substring(2, 4)
+		const toSq = move.substring(2, 4)
 		// To square Piece
-		const tSP = this.getPiece(tS)
+		const toSqP = this.getPiece(toSq)
 		// To square index
-		const tSI = this.board.findIndex(e => e.square === tS)
+		const toSqI = this.board.findIndex(e => e.square === toSq)
 
-		this.board[fSI].prePiece = fSP
-		this.board[fSI].curPiece = ''
-		this.board[fSI].occupiedBy = ''
-		this.board[tSI].prePiece = tSP
-		this.board[tSI].curPiece = fSP
-		this.board[tSI].occupiedBy = this.sideToMove
-		this.board[tSI].cPMoveCount = +this.board[fSI].cPMoveCount + 1
-		
-		if (tSP) this.captures.push(tSP)
+		this.board[fromSqI].prePiece = fromSqP
+		this.board[fromSqI].curPiece = ''
+		this.board[fromSqI].occupiedBy = ''
+		this.board[toSqI].prePiece = toSqP
+		this.board[toSqI].curPiece = fromSqP
+		this.board[toSqI].occupiedBy = this.sideToMove
+		this.board[toSqI].cPMoveCount = +this.board[fromSqI].cPMoveCount + 1
+
+
+		if (toSqP) this.captures.push(toSqP)
 
 		this.pvm = this.curValidMoves()
-		
+
 		this.pieces = this.boardDrawOrder.map(e => this.getPiece(e))
 
 		if (this.sideToMove === 'w') {
@@ -518,31 +536,54 @@ class ZenChess {
 
 		this.cvm = this.curValidMoves()
 
-		// Handle castling
-		// White
-		let castling
-		// 0 = Queen side, 56 = King side, 32 = King starting square
-		const wCastlingIndicies = [0, 32, 56]
-		const wKingStart = this.board[32]
-		const wKingSideRook = this.board[56]
-		const wQueenSideRook = this.board[0]
+		// Handle CastlingAbility prop
 		
+		if (fromSq === 'a1') this.Q = ''
+		if (fromSq === 'h1') this.K = ''
+		if (fromSq === 'e1') this.K = ''
+		if (fromSq === 'e1') this.Q = ''
+		if (fromSq === 'a8') this.q = ''
+		if (fromSq === 'h8') this.k = ''
+		if (fromSq === 'e8') this.k = ''
+		if (fromSq === 'e8') this.q = ''
 
-		// Black
-		//
-		const bCastlingIndicies = [7, 39, 63]
-		const bKingStart = this.board[39]
-		const bKingSideRook = this.board[63]
-		const bQueenSideRook = this.board[7]
-		
-		// Handle promotion
+		this.castlingAbility = `${this.K}${this.Q}${this.k}${this.q}`
+
+		// Handle if castle param is passed
+		if (castle) {
+			const cSI = this.board.findIndex(e => e.square === castle)
+			this.board[cOrigin].prePiece = fromSqP
+			this.board[cOrigin].curPiece = ''
+			this.board[cOrigin].occupiedBy = ''
+			this.board[cSI].prePiece = ''
+			this.board[cSI].curPiece = 'R'
+			this.board[cSI].occupiedBy = this.sideToMove
+			this.board[cSI].cPMoveCount = 1
+		}
 
 		// Handle en Passant
+		if (fromSqP === 'p' || fromSqP === 'P') {
+			const fromSqCoords = this.sqCoord('fromSq').reduce((acc, cur) => acc + cur, 0)
+			const toSqCoords = this.sqCoord('toSq').reduce((acc, cur) => acc + cur, 0)
+			const offset = Math.abs(fromSqCoords - toSqCoords)
+			if (offset === 2) {
+				// Handle White Pawn
+				const fX = this.sqCoord('fromSq')[0]
+				if (fromSqP === 'P') {
+					this.enPassantTarget = this.coordConv(fX, 2)
+				} else if (fromSqP === 'p') {
+					this.enPassantTarget = this.coordConv(fX, 5)
+				}
+			}
+		}
 
 		// Handle halfMoveClock
 
 		// Handle fullMoveCount
-		
+		if (this.sideToMove === 'b') this.fullMoveCount++
+
+		this.fen = this.fenEncoder()
+		return this.fen
 	}
 
 	/*  To-do
@@ -596,6 +637,7 @@ game.init()
 
 // console.log(game.curValidMoves())
 console.log(game.fenEncoder())
-console.log(game.board[39])
+// console.log(game.curValidMoves())
+console.log(game.move('f6e4', {}))
 
-// module.exports = ZenChess
+module.exports = ZenChess
