@@ -1,6 +1,7 @@
 const ChessGame = require('../zen')
+const activeGames = require('../data/active_games.json')
 
-let newGame
+let id = 0
 
 module.exports = {
 	newGame: (req, res) => {
@@ -8,9 +9,12 @@ module.exports = {
 		const { fen } = req.body
 		newGame = new ChessGame(fen)
 		newGame.init()
+		activeGames.push({ id, newGame })
 		res.status(200).send({
+			gameID: id++,
 			pos: newGame.pieces,
-			board: newGame.board
+			board: newGame.board,
+			cvm: newGame.curValidMoves()
 		})
 	},
 	moves: (req, res) => {

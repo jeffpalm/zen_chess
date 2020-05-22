@@ -178,6 +178,14 @@ h1 {
 	color: lightgray;
 }
 
+.invalid:hover {
+	cursor: not-allowed;
+	box-shadow: none;
+	opacity: 1;
+	background-size: 90%;
+	background-position: bottom 5px center;
+}
+
 .light {
 	background-color: lightgrey;
 }
@@ -207,12 +215,8 @@ h1 {
 	flex-direction: row;
 	border: 1px solid gray;
 	box-shadow: grey 1px 1px 50px;
-	transition: 1.5s;
-	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
-}
-
-.invalid {
-	opacity: .5;
+	/* transition: 1s;
+	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86); */
 }
 
 .attack {
@@ -220,7 +224,7 @@ h1 {
 }
 
 .move {
-	background: rgba(0, 241, 12, 0.418)
+	background: rgba(0, 241, 12, 0.2)
 }
 
 .wht {
@@ -257,7 +261,6 @@ h1 {
 	height: 70vw;
 	min-height: 400px;
 	max-height: 90vh;
-	transition: 1s;
 }
 
 .Rank-marker {
@@ -302,13 +305,24 @@ h1 {
 	background-image: url('./assets/img/white_king1x.svg');
 }
 
-.invalid {
-	opacity: 0.5;
-}
-
 @media only screen and (max-width: 600px) {
 	.logo {
 		text-align: center;
 		font-size: 4rem;
+	}
+}
+
+@keyframes move-to-center {
+	0% {
+		transform: translateX(0)
+	}
+	25% {
+		transform: translateX(50%)
+	}
+	75% {
+		transform: translateX(50%)
+	}
+	100% {
+		transform: translateX(0%)
 	}
 }

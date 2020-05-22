@@ -1,5 +1,5 @@
 [
-	{"square": "a1", "id": "00", "occupiedBy": "", "curPiece": "", "cPMoveCount": 0, "prePiece": "", "co lor": "dark" },
+	{"square": "a1", "id": "00", "occupiedBy": "", "curPiece": "", "cPMoveCount": 0, "prePiece": "", "color": "dark" },
 	{"square": "a2", "id": "01", "occupiedBy": "", "curPiece": "", "cPMoveCount": 0, "prePiece": "", "color": "light" },
 	{"square": "a3", "id": "02", "occupiedBy": "", "curPiece": "", "cPMoveCount": 0, "prePiece": "", "color": "dark" },
 	{"square": "a4", "id": "03", "occupiedBy": "", "curPiece": "", "cPMoveCount": 0, "prePiece": "", "color": "light" },

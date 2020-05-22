@@ -3,88 +3,28 @@ import axios from 'axios'
 import Square from './Square'
 import Files from './Files'
 import Ranks from './Ranks'
+import stBoard from '../assets/data/starting_chess_board.json'
+import drawOrder from '../assets/data/board_draw_order.json'
 
 export default class Board extends Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			file: [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ],
-			board: {},
-			drawOrder: [
-				'a8',
-				'b8',
-				'c8',
-				'd8',
-				'e8',
-				'f8',
-				'g8',
-				'h8',
-				'a7',
-				'b7',
-				'c7',
-				'd7',
-				'e7',
-				'f7',
-				'g7',
-				'h7',
-				'a6',
-				'b6',
-				'c6',
-				'd6',
-				'e6',
-				'f6',
-				'g6',
-				'h6',
-				'a5',
-				'b5',
-				'c5',
-				'd5',
-				'e5',
-				'f5',
-				'g5',
-				'h5',
-				'a4',
-				'b4',
-				'c4',
-				'd4',
-				'e4',
-				'f4',
-				'g4',
-				'h4',
-				'a3',
-				'b3',
-				'c3',
-				'd3',
-				'e3',
-				'f3',
-				'g3',
-				'h3',
-				'a2',
-				'b2',
-				'c2',
-				'd2',
-				'e2',
-				'f2',
-				'g2',
-				'h2',
-				'a1',
-				'b1',
-				'c1',
-				'd1',
-				'e1',
-				'f1',
-				'g1',
-				'h1'
-			],
+			file: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+			board: JSON.parse(JSON.stringify(stBoard)),
+			drawOrder: JSON.parse(JSON.stringify(drawOrder)),
 			dark: 'dark',
 			light: 'light',
 			curPos: [],
 			moves: [],
-			preMove: false
+			preMove: false,
+			preMoveSquare: '',
+			cvm: [],
+			mounted: false
 		}
 		this.drawBoard = this.drawBoard.bind(this)
-		this.preMove = this.preMove.bind(this)
+		this.squareClick = this.squareClick.bind(this)
 	}
 
 	// Iterates through the rank and file arrays in state to draw the board in a way
@@ -94,34 +34,39 @@ export default class Board extends Component {
 		let output = []
 		const { drawOrder, dark, light, moves, preMove, board, curPos } = this.state
 		for (let i = 0; i < drawOrder.length; i++) {
-			const sqName = drawOrder[i]
+			const sqI = board.findIndex(e => e.square === drawOrder[i])
+			const sqName = board[sqI].square
 			const isValidMove = moves.find(e => e.newSq === sqName)
-			let type = 'passive'
+			const cvmIndex = this.state.cvm.findIndex(e => e.origin === sqName)
+
+			let type
 			if (preMove) {
 				type = 'invalid'
 				if (isValidMove) type = isValidMove.type
+			} else {
+				cvmIndex === -1 ? type = 'invalid' : type = 'passive'
 			}
 			if (curPos) {
 				output.push(
 					<Square
-						preMove={this.preMove}
+						preMove={this.squareClick}
 						moveType={type}
 						rot={this.props.rot}
 						piece={curPos[i]}
 						key={sqName}
-						color={board[sqName] ? board[sqName].color : light}
+						color={board[sqI].color}
 						square={sqName}
 					/>
 				)
 			} else {
 				output.push(
 					<Square
-						preMove={this.preMove}
+						preMove={this.squareClick}
 						moveType={type}
 						rot={this.props.rot}
 						piece=''
 						key={sqName}
-						color={board[sqName] ? board[sqName].color : dark}
+						color={board[sqI].color}
 						square={sqName}
 					/>
 				)
@@ -130,31 +75,40 @@ export default class Board extends Component {
 		return output
 	}
 
-	preMove(e) {
-		const postBody = { square: e.target.id }
-		axios
-			.post('http://localhost:3500/game/moves', postBody)
-			.then(res => this.setState({ moves: res.data.moves, preMove: true }))
-			.catch(err => console.log(err))
+	squareClick(e) {
+		if (this.state.preMove) {
+			this.setState({
+				moves: [],
+				preMove: false,
+				preMoveSquare: ''
+			})
+		} else {
+			this.setState({
+				moves: this.state.cvm.filter(move => move.origin === e.target.id),
+				preMove: true,
+				preMoveSquare: e.target.id
+			})
+		}
 	}
 
 	componentDidMount() {
 		const postBody = { fen: this.props.fen }
 		axios
-			.post('http://localhost:3500/game', postBody)
-			.then(res => this.setState({ curPos: res.data.pos, board: res.data.board}))
+			.post('/api/game', postBody)
+			.then(res =>
+				this.setState({ curPos: res.data.pos, board: res.data.board, cvm: res.data.cvm, mounted: true })
+			)
 			.catch(err => console.log(err))
 	}
 
 	render() {
-		const board = this.drawBoard()
 		console.log(this.state)
 		const { rot } = this.props
 		return (
 			<div className={'flex Ranks ' + rot}>
 				<Ranks />
 				<div className='Board flex'>
-					{board}
+					{this.state.mounted ? this.drawBoard() : ''}
 					<Files fileNames={this.state.file} />
 				</div>
 			</div>

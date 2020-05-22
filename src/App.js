@@ -17,7 +17,7 @@ export default class App extends Component {
 			enPassantTarget: '',
 			halfMoveClock: 0,
 			fullMoveClock: 1,
-			rot: 'wht',
+			rot: 'wht'
 		}
 
 		this.uniUpdate = this.uniUpdate.bind(this)
