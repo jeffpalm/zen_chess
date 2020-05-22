@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
-// import Header from './components/Header'
-// import SideNav from './components/SideNav'
-import Board from './components/Board'
-// import Button from './components/Button'
+import Board from './Board'
 import './reset.css'
 import './App.css'
 

@@ -5,10 +5,10 @@ const SERVER_PORT = 9342
 
 app.use(express.json())
 
+app.get('/api/game/new', ctrl.newGame)
 
+app.post('/api/game/new', ctrl.newCustomGame)
 
-
-app.post('/api/game', ctrl.newGame)
-app.post('/api/game/moves', ctrl.moves)
+app.put('/api/game/move/:gid', ctrl.makeMove)
 
 app.listen(SERVER_PORT, () => console.log(`Server listening on port ${SERVER_PORT}`))
