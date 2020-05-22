@@ -33,8 +33,7 @@ export default class App extends Component {
 	render() {
 		return (
 			<div className='App flex center col'>
-				{/* <SideNav flipFn={ this.flipBoard }/> */}
-				<Board rot={this.state.rot} fen={this.state.fen} update={this.uniUpdate} />
+				<Board rot={this.state.rot} fen={this.state.fen} />
 			</div>
 		)
 	}
