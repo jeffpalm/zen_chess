@@ -9,77 +9,101 @@ export default class Board extends Component {
 		super(props)
 
 		this.state = {
-			board: JSON.parse(JSON.stringify(stBoard)),
 			drawOrder: JSON.parse(JSON.stringify(drawOrder)),
-			dark: 'dark',
-			light: 'light',
-			curPos: [],
-			moves: [],
+			board: JSON.parse(JSON.stringify(stBoard)),
+			pieces: [], // Array of pieces that lines up with drawOrder
+			moves: [], // Record of moves made in current game
+			cvm: [], // Current Valid move
+			sideToMove: '', // Side to move
+			outcome: '', // For game outcome. if blank, game is still ongoing
 			preMove: false,
-			cvm: [],
-			mounted: false
+			mounted: false,
+			selectedSquare: '',
+			ssMoves: []
 		}
 	}
 
-	// Iterates through the rank and file arrays in state to draw the board in a way
-
 	drawBoard = () => {
+		if (!this.state.mounted) return <span>Loading</span>
+
 		let output = []
-		const { drawOrder, dark, light, moves, preMove, board, curPos } = this.state
+
+		const {
+			drawOrder,
+			preMove,
+			board,
+			pieces,
+			cvm,
+			selectedSquare: ss,
+			ssMoves
+		} = this.state
+
 		for (let i = 0; i < drawOrder.length; i++) {
 			const sqI = board.findIndex(e => e.square === drawOrder[i])
 			const sqName = board[sqI].square
-			const isValidMove = moves.find(e => e.newSq === sqName)
-			const cvmIndex = this.state.cvm.findIndex(e => e.origin === sqName)
+			const fromIndex = cvm.findIndex(e => e.from === sqName)
 
+			// set type to invalid
+			// check cvm for origin
+			// if it doesn't exist, set invalid
 			let type
 			if (preMove) {
-				type = 'invalid'
-				if (isValidMove) type = isValidMove.type
+				
 			} else {
-				cvmIndex === -1 ? (type = 'invalid') : (type = 'passive')
+				if (fromIndex === -1) type = 'invalid'
 			}
+
 			output.push(
 				<Square
 					preMove={this.squareClick}
-					moveType={type}
+					type={type}
 					rot={this.props.rot}
-					piece={curPos[i]}
+					piece={pieces[i]}
 					key={sqName}
 					color={board[sqI].color}
 					square={sqName}
 				/>
 			)
 		}
+
 		return output
 	}
 
 	squareClick = e => {
-		if (this.state.preMove) {
-			this.setState({
-				moves: [],
-				preMove: false
-			})
-		} else {
-			this.setState({
-				moves: this.state.cvm.filter(move => move.origin === e.target.id),
-				preMove: true
-			})
-		}
+		const { preMove: pm, selectedSquare: ss, cvm } = this.state
+		this.setState({
+			preMove: !pm,
+			selectedSquare: ss ? '' : e.target.id,
+			ssMoves: ss ? [] : cvm.filter(e => e.from === ss)
+		})
 	}
 
+	makeMove = e => {}
+
 	componentDidMount() {
-		const postBody = { fen: this.props.fen }
 		axios
-			.post('/api/game', postBody)
-			.then(res =>
+			.get(`/api/game/${this.props.gid}`)
+			.then(res => {
+				const {
+					board,
+					pieces,
+					moves,
+					captures,
+					sideToMove,
+					cvm,
+					outcome
+				} = res.data
 				this.setState({
-					curPos: res.data.pos,
-					board: res.data.board,
-					cvm: res.data.cvm,
+					board,
+					pieces,
+					moves,
+					captures,
+					sideToMove,
+					cvm,
+					outcome,
 					mounted: true
 				})
-			)
+			})
 			.catch(err => console.log(err))
 	}
 
@@ -88,7 +112,9 @@ export default class Board extends Component {
 		const { rot } = this.props
 		return (
 			<div className={'flex Ranks ' + rot}>
-				<div className='Board flex'>{this.state.mounted ? this.drawBoard() : ''}</div>
+				<div className='Board flex'>
+					{this.state.mounted ? this.drawBoard() : ''}
+				</div>
 			</div>
 		)
 	}

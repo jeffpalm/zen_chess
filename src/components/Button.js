@@ -5,13 +5,11 @@ import React from 'react'
 // 2) className = classNames
 // 3) text = text to display
 
-const Button = props => {
-	const { className, fn, text } = props
+export default function Button(props) {
+	const { cn, fn, text } = props
 	return (
-		<button className={ className } onClick={fn}>
+		<button className={cn} onClick={fn}>
 			{text}
 		</button>
 	)
 }
-
-export default Button

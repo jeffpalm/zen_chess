@@ -1,0 +1,216 @@
+@font-face {
+	font-family: 'DecimalLight';
+	src: url('../fonts/Decimal-Light-Pro.otf') format('opentype');
+}
+@font-face {
+	font-family: 'DecimalBlack';
+	src: url('../fonts/Decimal-Black-Pro.otf') format('opentype');
+}
+@font-face {
+	font-family: 'GothamXNarrow';
+	src: url('../fonts/GothamXNarrow-Bold.otf') format('opentype');
+}
+@font-face {
+	font-family: 'OperatorMonoBook';
+	src: url('../fonts/OperatorMono-Book.otf') format('opentype');
+}
+@font-face {
+	font-family: 'OperatorMonoBookItalic';
+	src: url('../fonts/OperatorMono-BookItalic.otf') format('opentype');
+}
+@import url('https://fonts.googleapis.com/css2?family=Poiret+One&display=swap');
+
+body::-webkit-scrollbar {
+	display: none;
+}
+
+body {
+	box-sizing: border-box;
+	font-family: 'DecimalLight';
+}
+
+h1 {
+	font-size: 8em;
+	color: lightblue;
+}
+
+.po {
+	font-family: 'Poiret One';
+}
+
+.none {
+	background-color: none;
+	border: none;
+}
+
+.App {
+	text-align: center;
+	background-color: lightgray;
+	height: 100vh;
+	width: 100vw;
+}
+
+.flex {
+	display: flex;
+}
+
+.center {
+	justify-content: center;
+}
+
+.mid {
+	align-items: center;
+}
+
+.around {
+	justify-content: space-around;
+}
+
+.col {
+	flex-direction: column;
+	align-items: center;
+}
+
+.Square {
+	width: 12.5%;
+	height: 12.5%;
+	flex-direction: column-reverse;
+	align-items: baseline;
+	background: contain;
+	background-repeat: no-repeat;
+	transition: 0.3s;
+	background-size: 90%;
+	background-origin: border-box;
+	background-position: bottom 5px center;
+}
+
+.Square:hover {
+	cursor: pointer;
+	opacity: 0.8;
+	box-shadow: inset 0px 0px 15px 0px rgba(0, 0, 0, 0.7);
+	background-size: 100%;
+	background-position: bottom 2px center;
+}
+
+.Square-text {
+	font-size: 12px;
+	padding: 3px;
+	color: lightgray;
+}
+
+.invalid:hover {
+	cursor: not-allowed;
+	box-shadow: none;
+	opacity: 1;
+	background-size: 90%;
+	background-position: bottom 5px center;
+}
+
+.light {
+	background-color: lightgrey;
+}
+
+.dark {
+	background-color: darkslategrey;
+}
+
+.Board {
+	width: 70vw;
+	min-width: 400px;
+	height: 70vw;
+	min-height: 400px;
+	max-height: 90vh;
+	max-width: 90vh;
+	flex-wrap: wrap;
+	z-index: 2;
+	flex-direction: row;
+	border: 1px solid gray;
+	box-shadow: grey 1px 1px 50px;
+	/* transition: 1s;
+	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86); */
+}
+
+.attack {
+	background: rgba(250, 0, 0, 0.5);
+}
+
+.move {
+	background: rgba(0, 241, 12, 0.2);
+}
+
+.wht {
+	transform: rotate(0deg);
+}
+
+.blk {
+	transform: rotate(180deg);
+}
+
+.Board:after {
+	content: '';
+	padding-bottom: 100%;
+}
+
+.markers {
+	font-size: 1.2rem;
+	font-family: 'OperatorMonoBook';
+}
+
+.p {
+	background-image: url('../img/black_pawn1x.svg');
+}
+.P {
+	background-image: url('../img/white_pawn1x.svg');
+}
+.r {
+	background-image: url('../img/black_rook1x.svg');
+}
+.n {
+	background-image: url('../img/black_knight1x.svg');
+}
+.b {
+	background-image: url('../img/black_bishop1x.svg');
+}
+.q {
+	background-image: url('../img/black_queen1x.svg');
+}
+.k {
+	background-image: url('../img/black_king1x.svg');
+}
+.R {
+	background-image: url('../img/white_rook1x.svg');
+}
+.N {
+	background-image: url('../img/white_knight1x.svg');
+}
+.B {
+	background-image: url('../img/white_bishop1x.svg');
+}
+.Q {
+	background-image: url('../img/white_queen1x.svg');
+}
+.K {
+	background-image: url('../img/white_king1x.svg');
+}
+
+@media only screen and (max-width: 600px) {
+	.logo {
+		text-align: center;
+		font-size: 4rem;
+	}
+}
+
+@keyframes move-to-center {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(50%);
+	}
+	75% {
+		transform: translateX(50%);
+	}
+	100% {
+		transform: translateX(0%);
+	}
+}
