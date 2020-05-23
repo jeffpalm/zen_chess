@@ -25,7 +25,8 @@ class ZenChess {
 		this.Q = 'Q'
 		this.k = 'k'
 		this.q = 'q'
-		this.enPassantTarget = ''
+		this.enPassantTarget = '-'
+		this.eptCap = ''
 		this.halfMoveClock = ''
 		this.fullMoveCount = ''
 		// List of Current Valid Moves for sideToMove
@@ -75,7 +76,12 @@ class ZenChess {
 		this.halfMoveClock = this.fen.substring(wi[3] + 1, wi[4])
 		this.fullMoveCount = this.fen.substring(wi[4] + 1, this.fen.length)
 		this.cvm = this.curValidMoves()
+		this.board = this.board.map(sq => {
+			let cvm = this.cvm.filter(mv => mv.from === sq.square)
+			return { ...sq, cvm, type: cvm.length ? '' : 'invalid' }
+		})
 
+		// console.table(this.board)
 		// Load PVM for king vulnerability testing
 		// Opposite side to movc
 		// this.kingThreats = this.kingCheck()
@@ -215,7 +221,8 @@ class ZenChess {
 	pawnMoves = (xS, yS, stm) => {
 		const output = []
 		const ept = this.enPassantTarget
-		const eptP = this.getPiece(ept)
+		const eptP = this.getPiece(this.eptCap)
+
 		const from = this.coordConv(xS, yS)
 		switch (stm) {
 			case 'w':
@@ -261,7 +268,7 @@ class ZenChess {
 				// Check if piece is occupying attack square 2
 				if (wATwoPiece) {
 					// Check if piece is black
-					if (wATwoPiece === wAOnePiece.toLowerCase()) {
+					if (wATwoPiece === wATwoPiece.toLowerCase()) {
 						output.push({
 							to: wATwoName,
 							// Check if attack is promo square
@@ -667,6 +674,13 @@ class ZenChess {
 		this.board[toI].side = this.sideToMove
 		this.board[toI].cPMvCnt = +this.board[fromI].cPMvCnt + 1
 
+		if (type.includes('ep')) {
+			const epI = this.board.findIndex(e => e.square === this.eptCap)
+			this.board[epI].pP = this.board[epI].cP
+			this.board[epI].cP = ''
+			this.board[epI].side = ''
+		}
+
 		if (type.includes('atk') || fromP.toLowerCase() === 'p') {
 			this.halfMoveClock = 0
 		} else {
@@ -693,8 +707,10 @@ class ZenChess {
 				const fX = this.sqCoord(from)[0]
 				if (fromP === 'P') {
 					this.enPassantTarget = this.coordConv(fX, 2)
+					this.eptCap = this.coordConv(fX, 3)
 				} else if (fromP === 'p') {
 					this.enPassantTarget = this.coordConv(fX, 5)
+					this.eptCap = this.coordConv(fX, 4)
 				}
 			}
 		} else {

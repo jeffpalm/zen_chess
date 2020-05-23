@@ -2,18 +2,16 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import Square from './Square'
 import stBoard from '../assets/data/starting_chess_board.json'
-import drawOrder from '../assets/data/board_draw_order.json'
 
 export default class Board extends Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			drawOrder: JSON.parse(JSON.stringify(drawOrder)),
+			fen: '',
 			board: JSON.parse(JSON.stringify(stBoard)),
-			pieces: [], // Array of pieces that lines up with drawOrder
 			moves: [], // Record of moves made in current game
-			cvm: [], // Current Valid move
+			cvm: [], // Current Valid moves
 			sideToMove: '', // Side to move
 			outcome: '', // For game outcome. if blank, game is still ongoing
 			preMove: false,
@@ -23,53 +21,7 @@ export default class Board extends Component {
 		}
 	}
 
-	drawBoard = () => {
-		if (!this.state.mounted) return <span>Loading</span>
-
-		let output = []
-
-		const {
-			drawOrder,
-			preMove,
-			board,
-			pieces,
-			cvm,
-			selectedSquare: ss,
-			ssMoves
-		} = this.state
-
-		for (let i = 0; i < drawOrder.length; i++) {
-			const sqI = board.findIndex(e => e.square === drawOrder[i])
-			const sqName = board[sqI].square
-			const fromIndex = cvm.findIndex(e => e.from === sqName)
-
-			// set type to invalid
-			// check cvm for origin
-			// if it doesn't exist, set invalid
-			let type
-			if (preMove) {
-				
-			} else {
-				if (fromIndex === -1) type = 'invalid'
-			}
-
-			output.push(
-				<Square
-					preMove={this.squareClick}
-					type={type}
-					rot={this.props.rot}
-					piece={pieces[i]}
-					key={sqName}
-					color={board[sqI].color}
-					square={sqName}
-				/>
-			)
-		}
-
-		return output
-	}
-
-	squareClick = e => {
+	preMoveToggle = e => {
 		const { preMove: pm, selectedSquare: ss, cvm } = this.state
 		this.setState({
 			preMove: !pm,
@@ -78,13 +30,48 @@ export default class Board extends Component {
 		})
 	}
 
-	makeMove = e => {}
-
+	makeMove = e => {
+		const from = this.state.selectedSquare
+		const moveIndex = this.state.cvm.findIndex(
+			mv => mv.from === from && mv.to === e.target.id
+		)
+		const move = { move: this.state.cvm[moveIndex] }
+		axios
+			.put(`/api/game/move/${this.props.gid}`, move)
+			.then(res => {
+				const {
+					fen,
+					board,
+					moves,
+					captures,
+					sideToMove,
+					cvm,
+					outcome
+				} = res.data
+				this.setState({
+					fen,
+					board,
+					moves,
+					captures,
+					sideToMove,
+					cvm,
+					outcome,
+					preMove: false,
+					selectedSquare: ''
+				})
+				this.props.rotateBoard()
+			})
+			.catch(err => console.table(err))
+	}
+	componentDidUpdate() {
+		// console.log(this.state)
+	}
 	componentDidMount() {
 		axios
 			.get(`/api/game/${this.props.gid}`)
 			.then(res => {
 				const {
+					fen,
 					board,
 					pieces,
 					moves,
@@ -94,6 +81,7 @@ export default class Board extends Component {
 					outcome
 				} = res.data
 				this.setState({
+					fen,
 					board,
 					pieces,
 					moves,
@@ -108,13 +96,47 @@ export default class Board extends Component {
 	}
 
 	render() {
-		console.log(this.state)
-		const { rot } = this.props
+		// console.log(this.state)
+		const { rotation, dark, light } = this.props
+		const { preMove, board, cvm, selectedSquare: ss, ssMoves } = this.state
 		return (
-			<div className={'flex Ranks ' + rot}>
-				<div className='Board flex'>
-					{this.state.mounted ? this.drawBoard() : ''}
-				</div>
+			<div className={'Board flex ' + rotation}>
+				{!this.state.mounted
+					? ''
+					: board.map(sq => {
+							let validToSquare = cvm.some(
+								e => e.from === ss && e.to === sq.square
+							)
+							let validFromSquare = cvm.some(e => e.from === sq.square)
+							return (
+								<Square
+									key={sq.square}
+									action={
+										sq.cvm.length && !preMove
+											? this.preMoveToggle
+											: preMove && validToSquare
+											? this.makeMove
+											: validFromSquare
+											? this.preMoveToggle
+											: null
+									}
+									rotation={rotation}
+									piece={sq.cP}
+									color={sq.color === 'light' ? light : dark}
+									square={sq.square}
+									marker={rotation === 'rotW' ? sq.rotW : sq.rotB}
+									pms={
+										preMove && validToSquare
+											? 'move'
+											: ss === sq.square
+											? 'selected'
+											: validFromSquare
+											? ''
+											: 'invalid'
+									} // Pre-move style
+								/>
+							)
+					  })}
 			</div>
 		)
 	}

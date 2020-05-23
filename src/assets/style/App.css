@@ -84,6 +84,7 @@ h1 {
 	background-position: bottom 5px center;
 }
 
+.selected,
 .Square:hover {
 	cursor: pointer;
 	opacity: 0.8;
@@ -99,7 +100,7 @@ h1 {
 }
 
 .invalid:hover {
-	cursor: not-allowed;
+	cursor: default;
 	box-shadow: none;
 	opacity: 1;
 	background-size: 90%;
@@ -135,14 +136,14 @@ h1 {
 }
 
 .move {
-	background: rgba(0, 241, 12, 0.2);
+	box-shadow: inset 0px 0px 35px 0px rgba(0, 241, 12, 0.8);
 }
 
-.wht {
+.rotW {
 	transform: rotate(0deg);
 }
 
-.blk {
+.rotB {
 	transform: rotate(180deg);
 }
 
@@ -151,9 +152,10 @@ h1 {
 	padding-bottom: 100%;
 }
 
-.markers {
-	font-size: 1.2rem;
+.marker {
+	font-size: 2rem;
 	font-family: 'OperatorMonoBook';
+	padding: 5px;
 }
 
 .p {
@@ -192,6 +194,43 @@ h1 {
 .K {
 	background-image: url('../img/white_king1x.svg');
 }
+
+/* .p {
+	background-image: url('../img/black_pawn1x.png');
+}
+.P {
+	background-image: url('../img/white_pawn1x.png');
+}
+.r {
+	background-image: url('../img/black_rook1x.png');
+}
+.n {
+	background-image: url('../img/black_knight1x.png');
+}
+.b {
+	background-image: url('../img/black_bishop1x.png');
+}
+.q {
+	background-image: url('../img/black_queen1x.png');
+}
+.k {
+	background-image: url('../img/black_king1x.png');
+}
+.R {
+	background-image: url('../img/white_rook1x.png');
+}
+.N {
+	background-image: url('../img/white_knight1x.png');
+}
+.B {
+	background-image: url('../img/white_bishop1x.png');
+}
+.Q {
+	background-image: url('../img/white_queen1x.png');
+}
+.K {
+	background-image: url('../img/white_king1x.png');
+} */
 
 @media only screen and (max-width: 600px) {
 	.logo {

@@ -8,7 +8,7 @@ module.exports = {
 		const { fen } = req.body
 
 		const Game = new ChessGame(fen)
-		
+
 		Game.init()
 		activeGames.push({ id, Game })
 		console.table(activeGames)
@@ -17,7 +17,7 @@ module.exports = {
 		})
 	},
 	getGame: (req, res) => {
-		const {gid} = req.params
+		const { gid } = req.params
 
 		const index = activeGames.findIndex(e => e.id === +gid)
 
@@ -25,18 +25,24 @@ module.exports = {
 
 		const Game = activeGames[index].Game
 
-		const { fen, board, pieces, moves, captures, sideToMove, cvm, outcome, enPassantTarget } = Game
-
-		res.status(200).send({
+		const {
 			fen,
 			board,
-			pieces,
 			moves,
 			captures,
 			sideToMove,
 			cvm,
-			outcome,
-			enPassantTarget
+			outcome
+		} = Game
+
+		res.status(200).send({
+			fen,
+			board,
+			moves,
+			captures,
+			sideToMove,
+			cvm,
+			outcome
 		})
 	},
 	makeMove: (req, res) => {
@@ -48,21 +54,27 @@ module.exports = {
 
 		const Game = activeGames[index].Game
 		Game.move(move)
-		
+
 		Game.printBoard()
 
-		const { fen, board, pieces, moves, captures, sideToMove, cvm, outcome, enPassantTarget } = Game
-
-		res.status(200).send({
+		const {
 			fen,
 			board,
-			pieces,
 			moves,
 			captures,
 			sideToMove,
 			cvm,
-			outcome,
-			enPassantTarget
+			outcome
+		} = Game
+
+		res.status(200).send({
+			fen,
+			board,
+			moves,
+			captures,
+			sideToMove,
+			cvm,
+			outcome
 		})
 	},
 	finishGame: (req, res) => {
