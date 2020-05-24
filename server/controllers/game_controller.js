@@ -25,15 +25,7 @@ module.exports = {
 
 		const Game = activeGames[index].Game
 
-		const {
-			fen,
-			board,
-			moves,
-			captures,
-			sideToMove,
-			cvm,
-			outcome
-		} = Game
+		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
 
 		res.status(200).send({
 			fen,
@@ -54,18 +46,11 @@ module.exports = {
 
 		const Game = activeGames[index].Game
 		Game.move(move)
+		console.table(Game.board)
 
-		Game.printBoard()
+		// Game.printBoard()
 
-		const {
-			fen,
-			board,
-			moves,
-			captures,
-			sideToMove,
-			cvm,
-			outcome
-		} = Game
+		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
 
 		res.status(200).send({
 			fen,

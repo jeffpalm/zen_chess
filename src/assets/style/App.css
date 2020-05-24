@@ -30,10 +30,73 @@ body {
 }
 
 h1 {
-	font-size: 8em;
-	color: lightblue;
+	font-size: 12em;
+	color: #e3f2fd;
 }
 
+.welcome {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	width: 100vw;
+	padding: 50px;
+	transition: all 500ms linear;
+	opacity: 1;
+	animation: welcome-fade-in 2s ease-in;
+}
+
+.welcome-fade-out {
+	animation: welcome-fade-out 500ms ease-out !important;
+	opacity: 0;
+}
+
+@keyframes welcome-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes welcome-fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.logo-path-cont {
+}
+
+#logo-path {
+	
+}
+
+.game-sel {
+	background: none;
+	border: 2px solid #e3f2fd;
+	border-radius: 10px;
+	height: 100px;
+	min-width: 300px;
+	font-size: 3rem;
+	color: #e3f2fd;
+	font-family: 'Poiret One';
+	transition: all 200ms linear;
+}
+
+.game-sel:hover {
+	background-color: #e3f2fd;
+	color: #686963;
+	cursor: pointer;
+	transition: all 200ms linear;
+}
+
+h1,
 .po {
 	font-family: 'Poiret One';
 }
@@ -45,7 +108,7 @@ h1 {
 
 .App {
 	text-align: center;
-	background-color: lightgray;
+	background-color: #3B3D32;
 	height: 100vh;
 	width: 100vw;
 }
@@ -74,11 +137,11 @@ h1 {
 .Square {
 	width: 12.5%;
 	height: 12.5%;
-	flex-direction: column-reverse;
+	flex-direction: column;
 	align-items: baseline;
 	background: contain;
 	background-repeat: no-repeat;
-	transition: 0.3s;
+	transition: 150ms;
 	background-size: 90%;
 	background-origin: border-box;
 	background-position: bottom 5px center;
@@ -87,8 +150,8 @@ h1 {
 .selected,
 .Square:hover {
 	cursor: pointer;
-	opacity: 0.8;
-	box-shadow: inset 0px 0px 15px 0px rgba(0, 0, 0, 0.7);
+	opacity: 1;
+	box-shadow: inset 0px 0px 15px 0px rgba(38, 173, 159, 0.7);
 	background-size: 100%;
 	background-position: bottom 2px center;
 }
@@ -108,11 +171,13 @@ h1 {
 }
 
 .light {
-	background-color: lightgrey;
+	background-color: hsl(205, 87%, 94%);
+	color: hsl(170, 11%, 59%);
 }
 
 .dark {
-	background-color: darkslategrey;
+	background-color: hsl(170, 11%, 59%);
+	color:  hsl(205, 87%, 94%);
 }
 
 .Board {
@@ -125,8 +190,9 @@ h1 {
 	flex-wrap: wrap;
 	z-index: 2;
 	flex-direction: row;
-	border: 1px solid gray;
-	box-shadow: grey 1px 1px 50px;
+	border: 3px solid #E3F2FD;
+	box-shadow: 0px 0px 30px 0px #686963;
+	animation: welcome-fade-in 1s linear;
 	/* transition: 1s;
 	transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86); */
 }
@@ -136,7 +202,7 @@ h1 {
 }
 
 .move {
-	box-shadow: inset 0px 0px 35px 0px rgba(0, 241, 12, 0.8);
+	box-shadow: inset 0px 0px 35px 0px rgba(219, 84, 97, 0.7);
 }
 
 .rotW {
@@ -152,11 +218,12 @@ h1 {
 	padding-bottom: 100%;
 }
 
-.marker {
-	font-size: 2rem;
+#square-marker {
+	font-size: 1.5rem;
 	font-family: 'OperatorMonoBook';
 	padding: 5px;
-}
+	background: none;
+}	
 
 .p {
 	background-image: url('../img/black_pawn1x.svg');

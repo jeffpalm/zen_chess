@@ -96,6 +96,7 @@ export default class Board extends Component {
 	}
 
 	render() {
+		// console.table(imgs)
 		// console.log(this.state)
 		const { rotation, dark, light } = this.props
 		const { preMove, board, cvm, selectedSquare: ss, ssMoves } = this.state

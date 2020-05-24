@@ -11,24 +11,30 @@ const cb = require('./data/chess_board_array.json')
 class ZenChess {
 	constructor(fen) {
 		this.fen = fen
+		this.fenPiecesHelper = ''
+		this.fenBoardOrderHelper = JSON.parse(JSON.stringify(drawOrder))
+
 		// External Guides for reference
 		this.dir = JSON.parse(JSON.stringify(dir))
-		this.boardDrawOrder = JSON.parse(JSON.stringify(drawOrder))
 		this.cbIndex = JSON.parse(JSON.stringify(cb))
 		this.board = JSON.parse(JSON.stringify(board))
+
 		// Props used to construct FEN
 		this.moves = []
-		this.pieces = ''
 		this.sideToMove = ''
+
 		this.castlingAbility = `${this.K}${this.Q}${this.k}${this.q}`
 		this.K = 'K'
 		this.Q = 'Q'
 		this.k = 'k'
 		this.q = 'q'
+
 		this.enPassantTarget = '-'
 		this.eptCap = ''
+
 		this.halfMoveClock = ''
 		this.fullMoveCount = ''
+
 		// List of Current Valid Moves for sideToMove
 		this.cvm = []
 		// Captured pieces
@@ -50,9 +56,9 @@ class ZenChess {
 			}
 		})
 
-		this.pieces = parsedPieces
-		this.pieces.map((e, i) => {
-			const sq = this.boardDrawOrder[i]
+		this.fenPiecesHelper = parsedPieces
+		this.fenPiecesHelper.map((e, i) => {
+			const sq = this.fenBoardOrderHelper[i]
 			const index = this.board.findIndex(j => j.square === sq)
 			this.board[index].pP = this.board[index].cP
 			this.board[index].cP = e
@@ -80,21 +86,6 @@ class ZenChess {
 			let cvm = this.cvm.filter(mv => mv.from === sq.square)
 			return { ...sq, cvm, type: cvm.length ? '' : 'invalid' }
 		})
-
-		// console.table(this.board)
-		// Load PVM for king vulnerability testing
-		// Opposite side to movc
-		// this.kingThreats = this.kingCheck()
-
-		// if (this.sideToMove === 'w') {
-		// 	this.sideToMove = 'b'
-		// 	this.pvm = this.curValidMoves()
-		// 	this.sideToMove = 'w'
-		// } else {
-		// 	this.sideToMove = 'w'
-		// 	this.pvm = this.curValidMoves()
-		// 	this.sideToMove = 'b'
-		// }
 	}
 	// Converts starting square and offset coordinates into square name
 	coordConv = (x, y) => {
@@ -111,6 +102,11 @@ class ZenChess {
 		const index = this.board.findIndex(e => e.square === square)
 		if (index === -1) return false
 		return this.board[index].cP
+	}
+	getSquare = square => {
+		const index = this.board.findIndex(e => e.square === square)
+		if (index === -1) return false
+		return this.board[index]
 	}
 	// Max is optional param that is number of squares distance
 	oneDirection = (square, direction, stm, max) => {
@@ -413,8 +409,6 @@ class ZenChess {
 				for (let d in this.dir) {
 					arr.push(od(square, d, stm, 1))
 				}
-				// filter out illegal king moves
-				// arr = arr.filter(e => this.pvm.findIndex(f => f.square === e.to) === -1)
 
 				// handle castling
 				// White Kingside index
@@ -426,7 +420,7 @@ class ZenChess {
 				// Black Queenside index
 				const bQs = this.castlingAbility.indexOf('q')
 
-				if (wKs !== -1 && !this.board[40].cP && !this.board[48].cP) {
+				if (wKs !== -1 && !this.board[61].cP && !this.board[62].cP) {
 					arr.push({
 						to: 'g1',
 						type: 'move castle',
@@ -437,9 +431,9 @@ class ZenChess {
 				}
 				if (
 					wQs !== -1 &&
-					!this.board[24].cP &&
-					!this.board[16].cP &&
-					!this.board[8].cP
+					!this.board[57].cP &&
+					!this.board[58].cP &&
+					!this.board[59].cP
 				) {
 					arr.push({
 						to: 'c1',
@@ -450,7 +444,7 @@ class ZenChess {
 					})
 				}
 
-				if (bKs !== -1 && !this.board[47].cP && !this.board[55].cP) {
+				if (bKs !== -1 && !this.board[5].cP && !this.board[6].cP) {
 					arr.push({
 						to: 'g8',
 						type: 'move castle',
@@ -461,9 +455,9 @@ class ZenChess {
 				}
 				if (
 					bQs !== -1 &&
-					!this.board[31].cP &&
-					!this.board[23].cP &&
-					!this.board[15].cP
+					!this.board[1].cP &&
+					!this.board[2].cP &&
+					!this.board[3].cP
 				) {
 					arr.push({
 						to: 'c8',
@@ -501,7 +495,7 @@ class ZenChess {
 		// filter out any blanks
 
 		// Used to determine if game is stalemate or checkmate
-		let potKingAttacks = 0
+		// let potKingAttacks = 0
 
 		const output = this.board
 			.filter(e => e.side === this.sideToMove)
@@ -521,16 +515,16 @@ class ZenChess {
 				if (test === -1) {
 					return true
 				} else {
-					potKingAttacks += test / test
+					// potKingAttacks += test / test
 					return false
 				}
 			})
 
-		if (!output.length && potKingAttacks) {
-			this.outcome = 'mate'
-		} else if (!output.length && !potKingAttacks) {
-			this.outcome = 'stalemate'
-		}
+		// if (!output.length && potKingAttacks) {
+		// 	this.outcome = 'mate'
+		// } else if (!output.length && !potKingAttacks) {
+		// 	this.outcome = 'stalemate'
+		// }
 
 		return output
 	}
@@ -614,7 +608,7 @@ class ZenChess {
 	fenEncoder = () => {
 		let output
 		let blankCount = 0
-		output = this.pieces.reduce((acc, cur, i) => {
+		output = this.fenPiecesHelper.reduce((acc, cur, i) => {
 			if (cur) {
 				if ((i + 1) % 8 === 0) {
 					if (blankCount === 0) {
@@ -652,46 +646,95 @@ class ZenChess {
 	// Moves in pure coordinate notation
 	// <from square><to square>[<promoted to>]
 	// Must pass empty object at a minimum
+
 	move = ({ from, to, type, castle, cOrigin, promo }) => {
-		this.moves.push({ from, to, castle, cOrigin, promo })
+		const { eptCap } = this
+		const fromSq = this.getSquare(from)
+		const fromP = fromSq.cP
+		let fromCt = fromSq.cPMvCnt
+		const fromSide = fromSq.side
 
-		// From square
-		// From square piece
-		const fromP = promo ? promo : this.getPiece(from)
-		// From square index in board array
-		const fromI = this.board.findIndex(e => e.square === from)
-		// To square
-		// To square Piece
-		const toP = this.getPiece(to)
-		// To square index
-		const toI = this.board.findIndex(e => e.square === to)
+		let cOriginSq
+		let cOriginP
+		let cOriginCt
+		let cOriginSide
 
-		this.board[fromI].pP = fromP
-		this.board[fromI].cP = ''
-		this.board[fromI].side = ''
-		this.board[toI].pP = toP
-		this.board[toI].cP = fromP
-		this.board[toI].side = this.sideToMove
-		this.board[toI].cPMvCnt = +this.board[fromI].cPMvCnt + 1
-
-		if (type.includes('ep')) {
-			const epI = this.board.findIndex(e => e.square === this.eptCap)
-			this.board[epI].pP = this.board[epI].cP
-			this.board[epI].cP = ''
-			this.board[epI].side = ''
+		if (castle) {
+			cOriginSq = this.getSquare(cOrigin)
+			cOriginP = cOriginSq.cP
+			cOriginCt = cOriginSq.cPMvCnt
+			cOriginSide = cOriginSq.side
 		}
+		// Making Move on Board
+		this.board.forEach(sq => {
+			switch (sq.square) {
+				case cOrigin:
+				case from:
+					sq.pP = sq.cP
+					sq.cP = ''
+					sq.side = ''
+					sq.cPMvCnt = 0
+					break
 
-		if (type.includes('atk') || fromP.toLowerCase() === 'p') {
-			this.halfMoveClock = 0
-		} else {
-			if (this.halfMoveClock === 50) {
-				this.outcome = 'draw'
-			} else {
-				this.halfMoveClock++
+				case to:
+					if (sq.cP) this.captures.push(sq.cP)
+					sq.pP = sq.cP
+					sq.cP = promo ? promo : fromP
+					sq.side = fromSide
+					sq.cPMvCnt = ++fromCt
+					break
+
+				case castle:
+					sq.pP = sq.cP
+					sq.cP = cOriginP
+					sq.side = cOriginSide
+					sq.cPMvCnt = ++cOriginCt
+					break
+
+				case eptCap:
+					if (type.includes('ep')) {
+						sq.pP = sq.cP
+						sq.cP = ''
+						sq.side = ''
+						sq.cPMvCnt = 0
+					}
+					break
 			}
-		}
+		})
 
-		// Handle en Passant
+		// Check if king in check
+		const kingThreats = this.curValidMoves().filter(
+			e => this.getPiece(e.to) === 'k' || this.getPiece(e.to) === 'K'
+		)
+		kingThreats.length ? (this.outcome = 'check') : (this.outcome = '')
+
+		//#region Change side and increment fullMoveCount if necessary
+		if (this.sideToMove === 'w') {
+			this.sideToMove = 'b'
+		} else {
+			this.sideToMove = 'w'
+			this.fullMoveCount++
+		}
+		//#endregion
+
+		//#region Update castling ability
+		if (from === 'a1') this.Q = ''
+		if (from === 'h1') this.K = ''
+		if (from === 'e1') this.K = ''
+		if (from === 'e1') this.Q = ''
+		if (from === 'a8') this.q = ''
+		if (from === 'h8') this.k = ''
+		if (from === 'e8') this.k = ''
+		if (from === 'e8') this.q = ''
+
+		this.castlingAbility = `${
+			this.K + this.Q + this.k + this.q === ''
+				? '-'
+				: this.K + this.Q + this.k + this.q
+		}`
+		//#endregion
+
+		//#region Handle En Passant
 		if (fromP === 'p' || fromP === 'P') {
 			const fromCoords = this.sqCoord(from)
 				.split('')
@@ -716,49 +759,39 @@ class ZenChess {
 		} else {
 			this.enPassantTarget = '-'
 		}
+		//#endregion
 
-		if (toP) this.captures.push(toP)
-
-		this.pvm = this.curValidMoves()
-
-		this.pieces = this.boardDrawOrder.map(e => this.getPiece(e))
-
-		if (this.sideToMove === 'w') {
-			this.sideToMove = 'b'
+		//#region Handle HalfMoveClock
+		if (type.includes('atk') || fromP.toLowerCase() === 'p') {
+			this.halfMoveClock = 0
 		} else {
-			this.sideToMove = 'w'
-			this.fullMoveCount++
+			if (this.halfMoveClock === 50) {
+				this.outcome = 'draw'
+			} else {
+				this.halfMoveClock++
+			}
 		}
+		//#endregion
 
+		//#region Update FEN
+		this.fenPiecesHelper = this.fenBoardOrderHelper.map(e => this.getPiece(e))
+		this.fen = this.fenEncoder()
+		//#endregion
+
+		// Update current valid moves
 		this.cvm = this.curValidMoves()
 
-		// Handle CastlingAbility prop
-
-		if (from === 'a1') this.Q = ''
-		if (from === 'h1') this.K = ''
-		if (from === 'e1') this.K = ''
-		if (from === 'e1') this.Q = ''
-		if (from === 'a8') this.q = ''
-		if (from === 'h8') this.k = ''
-		if (from === 'e8') this.k = ''
-		if (from === 'e8') this.q = ''
-
-		this.castlingAbility = `${this.K}${this.Q}${this.k}${this.q}`
-
-		// Handle if castle param is passed
-		if (castle) {
-			const cSI = this.board.findIndex(e => e.square === castle)
-			this.board[cOrigin].pP = fromP
-			this.board[cOrigin].cP = ''
-			this.board[cOrigin].side = ''
-			this.board[cSI].pP = ''
-			this.board[cSI].cP = 'R'
-			this.board[cSI].side = this.sideToMove
-			this.board[cSI].cPMvCnt = 1
+		// Check for mate
+		if (!this.cvm.length && kingThreats.length) {
+			this.outcome = 'mate'
+		} else if (!this.cvm.length && !kingThreats.length) {
+			this.outcome = 'stalemate'
 		}
 
-		this.fen = this.fenEncoder()
-		return this
+		this.board.forEach(e => {
+			e.cvm = this.cvm.filter(f => f.from === e.square)
+			e.type = e.cvm.length ? '' : 'invalid'
+		})
 	}
 
 	printBoard = () => {
@@ -774,6 +807,12 @@ class ZenChess {
 		console.table(board)
 	}
 }
+
+// const game = new ZenChess('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+
+// game.init()
+
+// console.table(game.board)
 
 const engineTester = (fen, depth, i, results) => {}
 

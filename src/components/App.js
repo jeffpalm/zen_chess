@@ -32,20 +32,24 @@ export default class App extends Component {
 	}
 
 	start = () => {
+		this.setState({welcome: false})
 		if (this.state.gameType === 'solo') {
 			const postBody = { fen: this.state.startFEN }
 			axios
 				.post('/api/game/new/solo', postBody)
 				.then(res =>
-					this.setState({
-						gid: res.data.gid
-					})
+					setTimeout(() => {
+						this.setState({
+							gid: res.data.gid
+						})
+					}, 500)
+					
 				).catch(err => console.log(err))
 		}
 	}
 
 	render() {
-		const { gameType, gid, dark, light, rotation } = this.state
+		const { gameType, gid, dark, light, rotation, welcome } = this.state
 		return (
 			<div className='App flex center col'>
 				{gid ? (
@@ -58,7 +62,7 @@ export default class App extends Component {
 						light={light}
 					/>
 				) : (
-					<Welcome start={this.start} />
+					<Welcome start={this.start} vis={welcome} />
 				)}
 			</div>
 		)
