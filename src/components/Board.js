@@ -59,6 +59,7 @@ export default class Board extends Component {
 					preMove: false,
 					selectedSquare: ''
 				})
+				this.props.updateOutcome(outcome)
 				this.props.rotateBoard()
 			})
 			.catch(err => console.table(err))
@@ -99,9 +100,9 @@ export default class Board extends Component {
 		// console.table(imgs)
 		// console.log(this.state)
 		const { rotation, dark, light } = this.props
-		const { preMove, board, cvm, selectedSquare: ss, ssMoves } = this.state
+		const { preMove, board, cvm, selectedSquare: ss, outcome } = this.state
 		return (
-			<div className={'Board flex ' + rotation}>
+			<div className={`Board flex ${rotation} ${outcome === 'mate' ? 'blur' : ''}`}>
 				{!this.state.mounted
 					? ''
 					: board.map(sq => {

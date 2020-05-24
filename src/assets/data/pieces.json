@@ -2,61 +2,61 @@
 	"p": {
 		"name": "White Pawn",
 		"color": "white",
-		"img": "../assets/img/white_pawn1x.svg"
+		"img": "./img/pieces/white_pawn1x.svg"
 	},
 	"P": {
 		"name": "Black Pawn",
 		"color": "black",
-		"img": "../img/black_pawn1x.svg"
+		"img": "./img/pieces/black_pawn1x.svg"
 	},
 	"r": {
 		"name": "Black Rook",
 		"color": "black",
-		"img": "../img/black_rook1x.svg"
+		"img": "./img/pieces/black_rook1x.svg"
 	},
 	"n": {
 		"name": "Black Knight",
 		"color": "black",
-		"img": "../img/black_knight1x.svg"
+		"img": "./img/pieces/black_knight1x.svg"
 	},
 	"b": {
 		"name": "Black Bishop",
 		"color": "black",
-		"img": "../img/black_bishop1x.svg"
+		"img": "./img/pieces/black_bishop1x.svg"
 	},
 	"q": {
 		"name": "Black Queen",
 		"color": "black",
-		"img": "../img/black_queen1x.svg"
+		"img": "./img/pieces/black_queen1x.svg"
 	},
 	"k": {
 		"name": "Black King",
 		"color": "black",
-		"img": "../img/black_king1x.svg"
+		"img": "./img/pieces/black_king1x.svg"
 	},
 	"R": {
 		"name": "White Rook",
 		"color": "white",
-		"img": "../img/white_rook1x.svg"
+		"img": "./img/pieces/white_rook1x.svg"
 	},
 	"N": {
 		"name": "White Knight",
 		"color": "white",
-		"img": "../img/white_knight1x.svg"
+		"img": "./img/pieces/white_knight1x.svg"
 	},
 	"B": {
 		"name": "White Bishop",
 		"color": "white",
-		"img": "../img/white_bishop1x.svg"
+		"img": "./img/pieces/white_bishop1x.svg"
 	},
 	"Q": {
 		"name": "White Queen",
 		"color": "white",
-		"img": "../img/white_queen1x.svg"
+		"img": "./img/pieces/white_queen1x.svg"
 	},
 	"K": {
 		"name": "White King",
 		"color": "white",
-		"img": "../img/white_king1x.svg"
+		"img": "./img/pieces/white_king1x.svg"
 	}
 }

@@ -6,9 +6,9 @@ import React from 'react'
 // 3) text = text to display
 
 export default function Button(props) {
-	const { cn, fn, text } = props
+	const { cn, fn, text, btnid } = props
 	return (
-		<button className={cn} onClick={fn}>
+		<button className={cn} onClick={fn} id={btnid ? btnid : ''}>
 			{text}
 		</button>
 	)

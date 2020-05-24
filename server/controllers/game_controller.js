@@ -1,5 +1,6 @@
 const ChessGame = require('../zen')
-const activeGames = require('../data/active_games.json')
+
+const fs = require('fs')
 
 let id = 1
 
@@ -10,18 +11,27 @@ module.exports = {
 		const Game = new ChessGame(fen)
 
 		Game.init()
-		activeGames.push({ id, Game })
-		console.table(activeGames)
+		const gameObj = { id, Game }
+		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
+		
+		activeGames[id] = gameObj
+
+		fs.writeFileSync(
+			'./server/data/active_games.json',
+			JSON.stringify(activeGames)
+		)
 		res.status(200).send({
 			gid: id++
 		})
 	},
 	getGame: (req, res) => {
 		const { gid } = req.params
+		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
 
 		const index = activeGames.findIndex(e => e.id === +gid)
 
 		if (index === -1) return res.status(404).send('Invalid Game ID')
+		
 
 		const Game = activeGames[index].Game
 
@@ -40,6 +50,9 @@ module.exports = {
 	makeMove: (req, res) => {
 		const { gid } = req.params
 		const { move } = req.body
+
+		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
+
 		const index = activeGames.findIndex(e => e.id === +gid)
 
 		if (index === -1) return res.status(404).send('Invalid Game ID')
@@ -65,11 +78,13 @@ module.exports = {
 	finishGame: (req, res) => {
 		const { gid } = req.params
 
+		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
+
 		const index = activeGames.findIndex(e => e.id === +gid)
 
 		if (index === -1) return res.status(404).send('Invalid Game ID')
 
-		const { moves, fen, outcome } = activeGames[index]
+		// const { moves, fen, outcome } = activeGames[index]
 
 		delete activeGames[index]
 
