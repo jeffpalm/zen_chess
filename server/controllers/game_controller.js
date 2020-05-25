@@ -58,7 +58,7 @@ module.exports = {
 
 		if (!Game) return res.status(404).send('Invalid Game ID')
 
-		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
+		const { fen, board, moves, captures, sideToMove, cvm, status } = Game
 
 		res.status(200).send({
 			fen,
@@ -67,7 +67,7 @@ module.exports = {
 			captures,
 			sideToMove,
 			cvm,
-			outcome
+			status
 		})
 	},
 	makeMove: (req, res) => {
@@ -88,7 +88,7 @@ module.exports = {
 
 		Game.printBoard()
 
-		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
+		const { fen, board, moves, captures, sideToMove, cvm, status, outcome } = Game
 
 		res.status(200).send({
 			fen,
@@ -97,6 +97,7 @@ module.exports = {
 			captures,
 			sideToMove,
 			cvm,
+			status,
 			outcome
 		})
 
@@ -118,7 +119,7 @@ module.exports = {
 
 		if (!Game) return res.status(404).send('Invalid Game ID')
 
-		// const { moves, fen, outcome } = activeGames[index]
+		// const { moves, fen, status } = activeGames[index]
 
 		delete activeGames[gid]
 

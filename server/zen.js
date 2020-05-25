@@ -39,6 +39,7 @@ class ZenChess {
 		this.cvm = []
 		// Captured pieces
 		this.captures = []
+		this.status = ''
 		this.outcome = ''
 	}
 	static from(json) {
@@ -524,9 +525,9 @@ class ZenChess {
 			})
 
 		// if (!output.length && potKingAttacks) {
-		// 	this.outcome = 'mate'
+		// 	this.status = 'mate'
 		// } else if (!output.length && !potKingAttacks) {
-		// 	this.outcome = 'stalemate'
+		// 	this.status = 'stalemate'
 		// }
 
 		return output
@@ -712,7 +713,7 @@ class ZenChess {
 		const kingThreats = this.curValidMoves().filter(
 			e => this.getPiece(e.to) === 'k' || this.getPiece(e.to) === 'K'
 		)
-		kingThreats.length ? (this.outcome = 'check') : (this.outcome = '')
+		kingThreats.length ? (this.status = 'check') : (this.status = '')
 
 		//#region Change side and increment fullMoveCount if necessary
 		if (this.sideToMove === 'w') {
@@ -772,7 +773,7 @@ class ZenChess {
 			this.halfMoveClock = 0
 		} else {
 			if (this.halfMoveClock === 50) {
-				this.outcome = 'draw'
+				this.status = 'draw'
 			} else {
 				this.halfMoveClock++
 			}
@@ -789,9 +790,11 @@ class ZenChess {
 
 		// Check for mate
 		if (!this.cvm.length && kingThreats.length) {
-			this.outcome = 'mate'
+			this.status = 'mate'
+			fromSide === 'w' ? this.outcome = '1-0' : this.outcome = '0-1'
 		} else if (!this.cvm.length && !kingThreats.length) {
-			this.outcome = 'stalemate'
+			this.status = 'draw'
+			this.outcome = '.5-.5'
 		}
 
 		this.board.forEach(e => {

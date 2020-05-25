@@ -11,10 +11,11 @@ import flagIcon from '@iconify/icons-mdi-light/flag'
 import playIcon from '@iconify/icons-mdi-light/play'
 import pauseIcon from '@iconify/icons-mdi-light/pause'
 import Music from './Music'
-import socketIOClient from 'socket.io-client'
 import '../assets/style/reset.css'
 import '../assets/style/App.css'
+import socketIOClient from 'socket.io-client'
 const ENDPOINT = 'http://localhost:9342'
+const socket = socketIOClient(ENDPOINT)
 
 export default class App extends Component {
 	constructor(props) {
@@ -33,16 +34,19 @@ export default class App extends Component {
 			soundOn: true,
 			rotation: 'rotW',
 			preMove: false,
-			outcome: ''
+			status: '',
+			outcome: '',
+			mpSide: '',
+			sideToMove: ''
 		}
 	}
-
+	//#region Methods
 	gameOverToggle = () => {
 		this.setState({ gameover: !this.state.gameover })
 	}
 
-	updateOutcome = outcome => {
-		this.setState({ outcome })
+	updateStatus = (status, outcome, sideToMove) => {
+		this.setState({ status, outcome, sideToMove })
 	}
 
 	daddyPreMoveToggle = () => {
@@ -55,6 +59,15 @@ export default class App extends Component {
 
 	soundToggle = () => {
 		this.setState({ soundOn: !this.state.soundOn })
+	}
+
+	surrender = () => {
+		const { sideToMove } = this.state
+		let outcome
+		sideToMove === 'w' ? (outcome = '0-1') : (outcome = '1-0')
+
+		this.setState({ status: 'resign', outcome })
+		this.gameOverToggle()
 	}
 
 	rotateBoard = () => {
@@ -102,7 +115,7 @@ export default class App extends Component {
 					setTimeout(() => {
 						this.setState({
 							gid: res.data.gid,
-							outcome: '',
+							status: '',
 							rotation: 'rotW'
 						})
 					}, 500)
@@ -112,16 +125,13 @@ export default class App extends Component {
 	}
 
 	multiplayer = () => {
-		const socket = socketIOClient(ENDPOINT)
+		socket.emit('new-mp-game')
 		socket.on('new-game', data => {
 			console.log(data)
 		})
 	}
-
-	componentDidMount(){
-		
-		
-	}
+	//#endregion
+	componentDidMount() {}
 
 	render() {
 		const {
@@ -131,43 +141,58 @@ export default class App extends Component {
 			light,
 			rotation,
 			welcome,
+			status,
 			outcome,
 			gameover,
 			musicPlay,
 			soundOn,
 			preMove
 		} = this.state
-		
+
 		return (
 			<div className='App flex center col'>
-				<Music preMove={preMove} musicPlay={musicPlay} soundOn={soundOn}/>
+				<Music preMove={preMove} musicPlay={musicPlay} soundOn={soundOn} />
 
 				{gameover ? (
-					<GameOver outcome={outcome} newGame={this.newGame} vis={gameover} />
+					<GameOver
+						status={status}
+						outcome={outcome}
+						newGame={this.newGame}
+						vis={gameover}
+					/>
 				) : null}
 				{gid ? (
-					<Board
-						gameType={gameType}
-						gid={gid}
-						rotation={rotation}
-						rotateBoard={this.rotateBoard}
-						dark={dark}
-						light={light}
-						gameOverToggle={this.gameOverToggle}
-						updateOutcome={this.updateOutcome}
-						outcome={outcome}
-						daddyPNToggle={this.daddyPreMoveToggle}
-					/>
+					<div>
+						<div className='new-game-trans'></div>
+						<Board
+							gameType={gameType}
+							gid={gid}
+							rotation={rotation}
+							rotateBoard={this.rotateBoard}
+							dark={dark}
+							light={light}
+							gameOverToggle={this.gameOverToggle}
+							updateStatus={this.updateStatus}
+							status={status}
+							daddyPNToggle={this.daddyPreMoveToggle}
+						/>
+					</div>
 				) : (
-					<Welcome start={this.start} vis={welcome} multiplayer={this.multiplayer}/>
+					<Welcome
+						vis={welcome}
+						start={this.start}
+						multiplayer={this.multiplayer}
+					/>
 				)}
 				<div className='ctrl-cont'>
-					<Icon
-						className='ctrl-btn'
-						icon={refreshIcon}
-						style={{ color: '#fff', fontSize: '65px' }}
-						onClick={this.rotateBoard}
-					/>
+					{welcome ? null : (
+						<Icon
+							className='ctrl-btn'
+							icon={refreshIcon}
+							style={{ color: '#fff', fontSize: '65px' }}
+							onClick={this.rotateBoard}
+						/>
+					)}
 					{soundOn ? (
 						<Icon
 							className='ctrl-btn-off'
@@ -198,11 +223,14 @@ export default class App extends Component {
 							onClick={this.musicToggle}
 						/>
 					)}
-					<Icon
-						className='ctrl-btn'
-						icon={flagIcon}
-						style={{ color: '#fff', fontSize: '65px' }}
-					/>
+					{welcome ? null : (
+						<Icon
+							className='ctrl-btn'
+							icon={flagIcon}
+							style={{ color: '#fff', fontSize: '65px' }}
+							onClick={this.surrender}
+						/>
+					)}
 				</div>
 			</div>
 		)

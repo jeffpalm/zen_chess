@@ -3,7 +3,7 @@ const app = express()
 const http = require('http').Server(app)
 const ctrl = require('./controllers/game_controller')
 const io = require('socket.io')(http)
-const SERVER_PORT = 9342
+const SERVER_PORT = process.env.PORT || 9342
 
 app.use(express.json())
 
@@ -14,10 +14,10 @@ app.get('/', (req, res) => {
 let connections = 0
 let gid
 
-io.on('connection', socket => {
-    console.log(`Player ${socket.id} has connected`)
-    console.log('Connections: ', connections)
-    console.log('gid: ', gid)
+io.on('new-mp-game', socket => {
+	console.log(`Player ${socket.id} has connected`)
+	console.log('Connections: ', connections)
+	console.log('gid: ', gid)
 	if (connections === 0) {
 		gid = ctrl.newMultiplayerGame()
 		connections++
@@ -26,6 +26,10 @@ io.on('connection', socket => {
 	}
 	io.emit('new-game', gid)
 })
+
+if (connections === 1) {
+	io.emit('')
+}
 
 app.post('/api/game/new/solo', ctrl.newSoloGame)
 

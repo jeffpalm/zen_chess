@@ -33,7 +33,7 @@ export default class Board extends Component {
 					captures,
 					sideToMove,
 					cvm,
-					outcome
+					status
 				} = res.data
 				this.setState({
 					gid: this.props.gid,
@@ -42,7 +42,7 @@ export default class Board extends Component {
 					pieces,
 					moves,
 					captures,
-					outcome,
+					status,
 					sideToMove,
 					cvm,
 					mounted: true
@@ -63,6 +63,9 @@ export default class Board extends Component {
 
 	makeMove = e => {
 		const from = this.state.selectedSquare
+
+		this.props.daddyPNToggle()
+		this.state.pieceMove.play()
 		const moveIndex = this.state.cvm.findIndex(
 			mv => mv.from === from && mv.to === e.target.id
 		)
@@ -77,6 +80,7 @@ export default class Board extends Component {
 					captures,
 					sideToMove,
 					cvm,
+					status,
 					outcome
 				} = res.data
 				this.setState({
@@ -84,15 +88,14 @@ export default class Board extends Component {
 					board,
 					moves,
 					captures,
-					outcome,
+					status,
 					sideToMove,
 					cvm,
 					preMove: false,
 					selectedSquare: ''
 				})
-				if (outcome !== '' && outcome !== 'check') this.props.gameOverToggle()
-				this.props.updateOutcome(outcome)
-				this.props.daddyPNToggle()
+				if (status !== '' && status !== 'check') this.props.gameOverToggle()
+				this.props.updateStatus(status, outcome, sideToMove)
 				this.props.rotateBoard()
 			})
 			.catch(err => console.table(err))
@@ -100,21 +103,25 @@ export default class Board extends Component {
 
 	componentDidMount() {
 		this.getGame()
+		const pieceMove = document.querySelector('#piece-move')
+		this.setState({ pieceMove })
 	}
 
 	render() {
 		// console.table(imgs)
 		// console.log(this.state)
-		const { rotation, dark, light, outcome } = this.props
+		const { rotation, dark, light, status } = this.props
 		const { preMove, board, cvm, selectedSquare: ss, gid } = this.state
 		if (gid !== this.props.gid) {
 			this.getGame()
 		}
 		return (
 			<div
+				id='chess-board'
 				className={`Board flex ${rotation} ${
-					outcome === 'mate' ? 'blur' : ''
-				}`}>
+					status !== '' && status !== 'check' ? 'blur' : ''
+				} ${status === 'check' ? 'check' : ''}`}>
+				<audio src='assets/sounds/piecemove.ogg' id='piece-move'></audio>
 				{!this.state.mounted
 					? ''
 					: board.map(sq => {
@@ -132,7 +139,9 @@ export default class Board extends Component {
 											? this.makeMove
 											: validFromSquare
 											? this.preMoveToggle
-											: this.preMoveToggle
+											: preMove
+											? this.preMoveToggle
+											: null
 									}
 									rotation={rotation}
 									piece={sq.cP}

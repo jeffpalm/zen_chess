@@ -1,9 +1,6 @@
 import React, { Component } from 'react'
 import Button from './Button'
 
-const Filters = {}
-Filters.getPixels = img => {}
-
 export default class GameOver extends Component {
 	constructor() {
 		super()
@@ -12,14 +9,27 @@ export default class GameOver extends Component {
 	}
 
 	render() {
-		const { outcome, newGame } = this.props
+		const { status, newGame, outcome } = this.props
 		return (
 			<div className='game-over'>
 				<h1 id='game-over-heading'>such zen</h1>
 				<h2 id='game-over-type'>
-					that's a {outcome === 'mate' ? 'checkmate' : 'draw'}
+					{status === 'mate'
+						? outcome === '1-0'
+							? 'white wins by checkmate'
+							: 'black wins by checkmate'
+						: status === 'resign'
+						? outcome === '1-0'
+							? 'black wins, white resigns'
+							: 'white wins, black resigns'
+						: 'that is a draw'}
 				</h2>
-				<Button text='New Game' cn='game-sel' fn={newGame} btnid='game-over-btn' />
+				<Button
+					text='new game'
+					cn='game-sel'
+					fn={newGame}
+					btnid='game-over-btn'
+				/>
 			</div>
 		)
 	}
