@@ -11,10 +11,12 @@ module.exports = {
 		const Game = new ChessGame(fen)
 
 		Game.init()
-		const gameObj = { id, Game }
-		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
-		
-		activeGames[id] = gameObj
+
+		const activeGames = JSON.parse(
+			fs.readFileSync('./server/data/active_games.json')
+		)
+
+		activeGames[id] = Game
 
 		fs.writeFileSync(
 			'./server/data/active_games.json',
@@ -26,14 +28,14 @@ module.exports = {
 	},
 	getGame: (req, res) => {
 		const { gid } = req.params
-		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
+		const activeGames = JSON.parse(
+			fs.readFileSync('./server/data/active_games.json')
+		)
+		console.log(activeGames)
 
-		const index = activeGames.findIndex(e => e.id === +gid)
+		const Game = activeGames[gid]
 
-		if (index === -1) return res.status(404).send('Invalid Game ID')
-		
-
-		const Game = activeGames[index].Game
+		if (!Game) return res.status(404).send('Invalid Game ID')
 
 		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
 
@@ -53,15 +55,17 @@ module.exports = {
 
 		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
 
-		const index = activeGames.findIndex(e => e.id === +gid)
+		const Game = ChessGame.from(activeGames[gid])
 
-		if (index === -1) return res.status(404).send('Invalid Game ID')
-
-		const Game = activeGames[index].Game
+		
+		if (!Game) return res.status(404).send('Invalid Game ID')
+		
+				
 		Game.move(move)
-		console.table(Game.board)
+		console.log(Game.sideToMove)
+		// console.table(Game.board)
 
-		// Game.printBoard()
+		Game.printBoard()
 
 		const { fen, board, moves, captures, sideToMove, cvm, outcome } = Game
 
@@ -74,22 +78,36 @@ module.exports = {
 			cvm,
 			outcome
 		})
+
+		activeGames[gid] = Game
+
+		fs.writeFileSync(
+			'./server/data/active_games.json',
+			JSON.stringify(activeGames)
+		)
 	},
 	finishGame: (req, res) => {
 		const { gid } = req.params
 
-		const activeGames = JSON.parse(fs.readFileSync('./server/data/active_games.json'))
+		const activeGames = JSON.parse(
+			fs.readFileSync('./server/data/active_games.json')
+		)
 
-		const index = activeGames.findIndex(e => e.id === +gid)
+		const Game = activeGames[gid]
 
-		if (index === -1) return res.status(404).send('Invalid Game ID')
+		if (!Game) return res.status(404).send('Invalid Game ID')
 
 		// const { moves, fen, outcome } = activeGames[index]
 
-		delete activeGames[index]
+		delete activeGames[gid]
 
-		console.table(activeGames)
+		// console.log(activeGames)
 
 		res.status(200).send()
+
+		fs.writeFileSync(
+			'./server/data/active_games.json',
+			JSON.stringify(activeGames)
+		)
 	}
 }

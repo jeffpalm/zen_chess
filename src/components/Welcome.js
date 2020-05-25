@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Button from './Button'
 import Logo from './Logo'
-import { render } from '@testing-library/react'
 
 export default class Welcome extends Component {
 	constructor(props) {
@@ -32,6 +31,7 @@ export default class Welcome extends Component {
 					<Logo />
 				</div>
 				<Button cn='game-sel' fn={start} text='Chill Solo' />
+				
 			</div>
 		)
 	}

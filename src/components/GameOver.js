@@ -12,8 +12,7 @@ export default class GameOver extends Component {
 	}
 
 	render() {
-		const { outcome, newGame, finish } = this.props
-		finish()
+		const { outcome, newGame } = this.props
 		return (
 			<div className='game-over'>
 				<h1 id='game-over-heading'>such zen</h1>

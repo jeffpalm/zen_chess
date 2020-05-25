@@ -8,17 +8,47 @@ export default class Board extends Component {
 		super(props)
 
 		this.state = {
+			gid: '',
 			fen: '',
 			board: JSON.parse(JSON.stringify(stBoard)),
 			moves: [], // Record of moves made in current game
 			cvm: [], // Current Valid moves
 			sideToMove: '', // Side to move
-			outcome: '', // For game outcome. if blank, game is still ongoing
 			preMove: false,
 			mounted: false,
 			selectedSquare: '',
 			ssMoves: []
 		}
+	}
+
+	getGame = () => {
+		axios
+			.get(`/api/game/${this.props.gid}`)
+			.then(res => {
+				const {
+					fen,
+					board,
+					pieces,
+					moves,
+					captures,
+					sideToMove,
+					cvm,
+					outcome
+				} = res.data
+				this.setState({
+					gid: this.props.gid,
+					fen,
+					board,
+					pieces,
+					moves,
+					captures,
+					outcome,
+					sideToMove,
+					cvm,
+					mounted: true
+				})
+			})
+			.catch(err => console.log(err))
 	}
 
 	preMoveToggle = e => {
@@ -28,6 +58,7 @@ export default class Board extends Component {
 			selectedSquare: ss ? '' : e.target.id,
 			ssMoves: ss ? [] : cvm.filter(e => e.from === ss)
 		})
+		this.props.daddyPNToggle()
 	}
 
 	makeMove = e => {
@@ -53,56 +84,37 @@ export default class Board extends Component {
 					board,
 					moves,
 					captures,
+					outcome,
 					sideToMove,
 					cvm,
-					outcome,
 					preMove: false,
 					selectedSquare: ''
 				})
+				if (outcome !== '' && outcome !== 'check') this.props.gameOverToggle()
 				this.props.updateOutcome(outcome)
+				this.props.daddyPNToggle()
 				this.props.rotateBoard()
 			})
 			.catch(err => console.table(err))
 	}
-	componentDidUpdate() {
-		// console.log(this.state)
-	}
+
 	componentDidMount() {
-		axios
-			.get(`/api/game/${this.props.gid}`)
-			.then(res => {
-				const {
-					fen,
-					board,
-					pieces,
-					moves,
-					captures,
-					sideToMove,
-					cvm,
-					outcome
-				} = res.data
-				this.setState({
-					fen,
-					board,
-					pieces,
-					moves,
-					captures,
-					sideToMove,
-					cvm,
-					outcome,
-					mounted: true
-				})
-			})
-			.catch(err => console.log(err))
+		this.getGame()
 	}
 
 	render() {
 		// console.table(imgs)
 		// console.log(this.state)
-		const { rotation, dark, light } = this.props
-		const { preMove, board, cvm, selectedSquare: ss, outcome } = this.state
+		const { rotation, dark, light, outcome } = this.props
+		const { preMove, board, cvm, selectedSquare: ss, gid } = this.state
+		if (gid !== this.props.gid) {
+			this.getGame()
+		}
 		return (
-			<div className={`Board flex ${rotation} ${outcome === 'mate' ? 'blur' : ''}`}>
+			<div
+				className={`Board flex ${rotation} ${
+					outcome === 'mate' ? 'blur' : ''
+				}`}>
 				{!this.state.mounted
 					? ''
 					: board.map(sq => {
@@ -120,7 +132,7 @@ export default class Board extends Component {
 											? this.makeMove
 											: validFromSquare
 											? this.preMoveToggle
-											: null
+											: this.preMoveToggle
 									}
 									rotation={rotation}
 									piece={sq.cP}
@@ -132,6 +144,8 @@ export default class Board extends Component {
 											? 'move'
 											: ss === sq.square
 											? 'selected'
+											: preMove && !validToSquare
+											? 'not-move'
 											: validFromSquare
 											? ''
 											: 'invalid'

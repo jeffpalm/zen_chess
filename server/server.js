@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const server = require('http').Server(app);
 const ctrl = require('./controllers/game_controller')
 const SERVER_PORT = 9342
 

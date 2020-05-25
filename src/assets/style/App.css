@@ -146,10 +146,12 @@ h1,
 .selected,
 .Square:hover {
 	cursor: pointer;
-	opacity: 1;
-	box-shadow: inset 0px 0px 15px 0px rgba(38, 173, 159, 0.7);
 	background-size: 100%;
 	background-position: bottom 2px center;
+}
+
+.selected{
+	/* box-shadow: inset 0px 0px 35px 0px rgba(35, 206, 107, 0.8); */
 }
 
 .Square-text {
@@ -164,6 +166,11 @@ h1,
 	opacity: 1;
 	background-size: 90%;
 	background-position: bottom 5px center;
+}
+
+.not-move {
+	/* filter: blur(1px); */
+	opacity: .6;
 }
 
 .light {
@@ -197,8 +204,14 @@ h1,
 	background: rgba(250, 0, 0, 0.5);
 }
 
-.move {
-	box-shadow: inset 0px 0px 35px 0px rgba(219, 84, 97, 0.7);
+.move.dark {
+	box-shadow: inset 0px 0px 30px 0px hsl(205, 87%, 94%);
+	box-shadow:  0px 0px 30px 0px hsl(205, 87%, 94%);
+	/* background-image: radial-gradient(hsla(145, 71%, 47%, .8) 0%, transparent 80%, transparent 100%); */
+}
+.move.light {
+	box-shadow: inset 0px 0px 30px 0px hsl(170, 11%, 59%);
+	box-shadow:  0px 0px 30px 0px hsl(205, 87%, 94%);
 }
 
 .rotW {
@@ -271,6 +284,7 @@ h1,
 	position: fixed;
 	top: 0;
 	left: 0;
+	transition: all 2s ease-in;
 }
 
 #game-over-btn,
@@ -299,10 +313,57 @@ h1,
 	transition: filter 2s linear;
 }
 
-@media only screen and (max-width: 600px) {
+
+.ctrl-btn-on,
+.ctrl-btn-off,
+.ctrl-btn {
+	cursor: pointer;
+	fill: #e3f2fd;
+	stroke-width: .5;
+	z-index: 4;
+	position: relative;
+}
+
+.ctrl-btn-on:hover,
+.ctrl-btn-off:hover,
+.ctrl-btn:hover {
+	transition: all 100ms linear;
+	stroke-width: 1;
+}
+
+
+.ctrl-btn-off:hover {
+	stroke: #DB5461;
+}
+
+.ctrl-btn-on:hover{
+	stroke: #23CE6B;
+}
+
+.ctrl-btn:hover{
+	stroke: #E3F2FD;
+}
+
+@media only screen and (max-width: 800px) {
 	.logo {
 		text-align: center;
 		font-size: 4rem;
+	}
+	.Board {
+		width: 95vw;
+		min-width: 400px;
+		height: 95vw;
+		min-height: 400px;
+		max-height: 90vh;
+		max-width: 90vh;
+		flex-wrap: wrap;
+		z-index: 2;
+		flex-direction: row;
+		border: 3px solid #e3f2fd;
+		box-shadow: 0px 0px 30px 0px #686963;
+		animation: welcome-fade-in 1s linear;
+		/* transition: 1s;
+		transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86); */
 	}
 }
 

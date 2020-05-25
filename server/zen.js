@@ -41,6 +41,9 @@ class ZenChess {
 		this.captures = []
 		this.outcome = ''
 	}
+	static from(json) {
+		return Object.assign(new ZenChess(), json)
+	}
 	// Initializes game and populates property values based on FEN
 	init = () => {
 		// Converting FEN to 1 dimension array matching board
@@ -665,6 +668,9 @@ class ZenChess {
 			cOriginCt = cOriginSq.cPMvCnt
 			cOriginSide = cOriginSq.side
 		}
+
+		this.moves.push({ from, to, type, castle, cOrigin, promo })
+
 		// Making Move on Board
 		this.board.forEach(sq => {
 			switch (sq.square) {
@@ -711,7 +717,7 @@ class ZenChess {
 		//#region Change side and increment fullMoveCount if necessary
 		if (this.sideToMove === 'w') {
 			this.sideToMove = 'b'
-		} else {
+		} else if (this.sideToMove === 'b') {
 			this.sideToMove = 'w'
 			this.fullMoveCount++
 		}
