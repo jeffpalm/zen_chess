@@ -31,8 +31,7 @@ export default class Welcome extends Component {
 					<Logo />
 				</div>
 				<Button cn='game-sel' fn={start} text='chill solo' />
-				<Button cn='game-sel' fn={multiplayer} text='share the zen' />
-				
+				{/* <Button cn='game-sel' fn={multiplayer} text='share the zen' /> */}
 			</div>
 		)
 	}
