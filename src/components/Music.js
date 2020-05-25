@@ -54,7 +54,7 @@ export default class Music extends Component {
 		
 		return (
 			<div>
-				<audio id='audio-player' src='assets/music/Lo-fi-beats.ogg'></audio>
+				<audio id='audio-player' src='assets/music/Lo-fi-beats.ogg' autoPlay></audio>
 				{/* <input type="range" id="volume" min="-1" max="2" value={this.state.gain} step="0.01" onChange={this.setGain}></input>
                 <input type="range" id="freq" min="0" max="20000" value={this.state.freq} step="0.01" onChange={this.setFreq}></input> */}
 			</div>

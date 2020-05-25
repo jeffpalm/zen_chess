@@ -11,8 +11,10 @@ import flagIcon from '@iconify/icons-mdi-light/flag'
 import playIcon from '@iconify/icons-mdi-light/play'
 import pauseIcon from '@iconify/icons-mdi-light/pause'
 import Music from './Music'
+import socketIOClient from 'socket.io-client'
 import '../assets/style/reset.css'
 import '../assets/style/App.css'
+const ENDPOINT = 'http://localhost:9342'
 
 export default class App extends Component {
 	constructor(props) {
@@ -109,6 +111,18 @@ export default class App extends Component {
 		}
 	}
 
+	multiplayer = () => {
+		const socket = socketIOClient(ENDPOINT)
+		socket.on('new-game', data => {
+			console.log(data)
+		})
+	}
+
+	componentDidMount(){
+		
+		
+	}
+
 	render() {
 		const {
 			gameType,
@@ -123,6 +137,7 @@ export default class App extends Component {
 			soundOn,
 			preMove
 		} = this.state
+		
 		return (
 			<div className='App flex center col'>
 				<Music preMove={preMove} musicPlay={musicPlay} soundOn={soundOn}/>
@@ -144,7 +159,7 @@ export default class App extends Component {
 						daddyPNToggle={this.daddyPreMoveToggle}
 					/>
 				) : (
-					<Welcome start={this.start} vis={welcome} />
+					<Welcome start={this.start} vis={welcome} multiplayer={this.multiplayer}/>
 				)}
 				<div className='ctrl-cont'>
 					<Icon

@@ -21,7 +21,7 @@ export default class Welcome extends Component {
 		logo.style.strokeDashoffset = '0'
 	}
 	render() {
-		const { start, vis } = this.props
+		const { start, vis, multiplayer } = this.props
 		return (
 			<div
 				className={`welcome ${vis ? '' : 'welcome-fade-out'}`}
@@ -30,7 +30,8 @@ export default class Welcome extends Component {
 					<h1>zen</h1>
 					<Logo />
 				</div>
-				<Button cn='game-sel' fn={start} text='Chill Solo' />
+				<Button cn='game-sel' fn={start} text='chill solo' />
+				<Button cn='game-sel' fn={multiplayer} text='share the zen' />
 				
 			</div>
 		)

@@ -6,7 +6,9 @@ let id = 1
 
 module.exports = {
 	newSoloGame: (req, res) => {
-		const { fen } = req.body
+		let { fen } = req.body
+
+		if (!fen) fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
 		const Game = new ChessGame(fen)
 
@@ -25,6 +27,25 @@ module.exports = {
 		res.status(200).send({
 			gid: id++
 		})
+	},
+	newMultiplayerGame: () => {
+		const fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+
+		const Game = new ChessGame(fen)
+
+		Game.init()
+
+		const activeGames = JSON.parse(
+			fs.readFileSync('./server/data/active_games.json')
+		)
+
+		activeGames[id] = Game
+
+		fs.writeFileSync(
+			'./server/data/active_games.json',
+			JSON.stringify(activeGames)
+		)
+		return {gid: id++}
 	},
 	getGame: (req, res) => {
 		const { gid } = req.params
