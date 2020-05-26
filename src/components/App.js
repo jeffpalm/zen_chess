@@ -130,7 +130,7 @@ export default class App extends Component {
 	// 		console.log(data)
 	// 	})
 	// }
-	//#endregion
+	
 	componentDidMount() {}
 
 	render() {

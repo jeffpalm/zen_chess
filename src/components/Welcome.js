@@ -21,7 +21,7 @@ export default class Welcome extends Component {
 		logo.style.strokeDashoffset = '0'
 	}
 	render() {
-		const { start, vis, multiplayer } = this.props
+		const { start, vis } = this.props
 		return (
 			<div
 				className={`welcome ${vis ? '' : 'welcome-fade-out'}`}

@@ -48,6 +48,7 @@ export default class Music extends Component {
 			const chessBoard = document.querySelector('#chess-board')
 			if (this.props.musicPlay && chessBoard) {
 				void analyserNode.getFloatFrequencyData(freqArray)
+				// console.log(freqArray)
 				let output = freqArray.reduce((acc, cur) => -1 / (acc + cur), 0)
 				output *= 10000
 				output -= 40
@@ -57,14 +58,14 @@ export default class Music extends Component {
 			} else if (!this.props.musicPlay && chessBoard) {
 				chessBoard.style.boxShadow = `0px 0px 10px 0px white`
 			}
-		}, 50)
+		}, 17)
 	}
 	componentDidMount() {
 		const audioPlayer = document.querySelector('#audio-player')
 
 		audioPlayer.loop = true
 		audioPlayer.currentTime = Math.ceil(Math.random() * 3000)
-		console.log(audioPlayer.prototype)
+		// console.log(audioPlayer.prototype)
 		this.setState({ audioPlayer })
 		const { audioCtx, gainNode, filterNode, analyserNode } = this.state
 		const track = audioCtx.createMediaElementSource(audioPlayer)
