@@ -9,7 +9,11 @@ export default class Square extends Component {
 				className={`Square flex ${color} ${piece} ${rotation} ${pms}`}
 				onClick={action}
 				id={square}>
-				{marker ? <span id="square-marker" className={`marker ${color}`}>{marker}</span> : null}
+				{marker ? (
+					<span id='square-marker' className={`marker ${color}`}>
+						{marker}
+					</span>
+				) : null}
 			</div>
 		)
 	}

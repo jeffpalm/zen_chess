@@ -10,15 +10,12 @@ ___
     - Just chess
     - Clean UI, quick matchmaking, and great sounds.
 
-- I started learning JavaScript 2 months ago, and I also love chess. I decided to challenge myself to program a chess engine from scratch without looking at any existing chess programming resources[^1] in the spirit of immersing myself in learning how to code.
+- I started learning JavaScript 2 months before this, and I also love chess. I decided to challenge myself to program a chess engine from scratch without looking at any existing chess programming resources[^1] in the spirit of immersing myself in learning how to code.
 - The goal was to generate all legal moves for every possible chess position
 
 ### Functionality
 - Backend engine is written from scratch based on 8x8 grid system and offset coordinates from each square:
 	![diagram of 8x8 grid](/docs/board_grid.png)  
-
-### Wireframe
-![diagram](/docs/Wireframe.png)
     
 ___
 ## Endpoints

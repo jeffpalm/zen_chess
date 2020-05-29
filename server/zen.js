@@ -823,6 +823,6 @@ class ZenChess {
 
 // console.table(game.board)
 
-const engineTester = (fen, depth, i, results) => {}
+// const engineTester = (fen, depth, i, results) => {}
 
 module.exports = ZenChess

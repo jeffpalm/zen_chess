@@ -13,9 +13,6 @@ import pauseIcon from '@iconify/icons-mdi-light/pause'
 import Music from './Music'
 import '../assets/style/reset.css'
 import '../assets/style/App.css'
-// import socketIOClient from 'socket.io-client'
-// const ENDPOINT = 'http://localhost:9342'
-// const socket = socketIOClient(ENDPOINT)
 
 export default class App extends Component {
 	constructor(props) {
@@ -124,13 +121,6 @@ export default class App extends Component {
 		}
 	}
 
-	// multiplayer = () => {
-	// 	socket.emit('new-mp-game')
-	// 	socket.on('new-game', data => {
-	// 		console.log(data)
-	// 	})
-	// }
-	
 	componentDidMount() {}
 
 	render() {
